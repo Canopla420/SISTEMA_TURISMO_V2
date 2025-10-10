@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitar Visita Turística - {{ super() }}{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <h1 class="text-center mb-4">🏛️ Solicitar Visita Turística</h1>
+        <p class="text-center text-muted mb-5">
+            Completa el formulario para solicitar una visita a los prestadores turísticos de Esperanza
+        </p>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">Formulario de Solicitud</h5>
+                <p class="text-muted">
+                    Próximamente: Formulario completo con filtrado de prestadores
+                </p>
+                
+                <!-- Enlaces de prueba -->
+                <div class="mt-4">
+                    <h6>Enlaces de prueba:</h6>
+                    <a href="{{ url_for('main.test') }}" class="btn btn-outline-primary me-2">Test General</a>
+                    <a href="{{ url_for('admin.dashboard') }}" class="btn btn-outline-success me-2">Panel Admin</a>
+                    <a href="{{ url_for('prestador.dashboard') }}" class="btn btn-outline-info">Panel Prestador</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

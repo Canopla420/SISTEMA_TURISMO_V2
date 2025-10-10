@@ -1,0 +1,230 @@
+/* ==========================================================================
+   SISTEMA DE TURISMO - CSS MODULAR
+   ========================================================================== */
+
+/* 1. VARIABLES GLOBALES */
+:root {
+    /* Colores del sistema */
+    --color-primary: #0d6efd;
+    --color-secondary: #6c757d;
+    --color-success: #198754;
+    --color-info: #0dcaf0;
+    --color-warning: #ffc107;
+    --color-danger: #dc3545;
+    
+    /* Colores específicos del proyecto */
+    --color-turismo: #1976d2;
+    --color-admin: #2e7d32;
+    --color-prestador: #f57c00;
+    --color-institucion: #7b1fa2;
+    
+    /* Espaciado */
+    --spacing-xs: 0.25rem;
+    --spacing-sm: 0.5rem;
+    --spacing-md: 1rem;
+    --spacing-lg: 1.5rem;
+    --spacing-xl: 3rem;
+    
+    /* Tipografía */
+    --font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    --font-size-sm: 0.875rem;
+    --font-size-base: 1rem;
+    --font-size-lg: 1.25rem;
+    
+    /* Sombras */
+    --shadow-sm: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+    --shadow-md: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+    
+    /* Transiciones */
+    --transition-fast: 0.15s ease-in-out;
+    --transition-normal: 0.3s ease-in-out;
+}
+
+/* 2. RESET Y BASE */
+body {
+    font-family: var(--font-family);
+    line-height: 1.6;
+}
+
+main {
+    min-height: calc(100vh - 200px);
+}
+
+/* 3. COMPONENTES REUTILIZABLES */
+
+/* Navbar - CENTRADO PERFECTO CON ENLACES A LA DERECHA */
+.navbar-turismo {
+    background-color: var(--color-turismo) !important;
+    padding: var(--spacing-md) 0;
+}
+
+.navbar-turismo .container {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    width: 100%;
+}
+
+.navbar-turismo .navbar-brand {
+    font-weight: 700;
+    font-size: 2rem;
+    letter-spacing: 1px;
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+    grid-column: 2;
+    text-align: center;
+    margin: 0;
+}
+
+.navbar-turismo .navbar-collapse {
+    grid-column: 3;
+    justify-self: end;
+}
+
+.navbar-turismo .navbar-nav {
+    display: flex;
+    margin: 0 !important;
+    text-align: right;
+}
+
+.navbar-turismo .nav-link {
+    font-weight: 500;
+    margin: 0 var(--spacing-sm);
+    transition: color var(--transition-fast);
+    text-align: left;
+}
+
+.navbar-turismo .nav-link:hover {
+    color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Botón hamburguesa (móviles) */
+.navbar-turismo .navbar-toggler {
+    grid-column: 3;
+    justify-self: end;
+    border: none;
+    padding: 0.25rem 0.5rem;
+}
+
+/* Para móviles - mantener el comportamiento responsive */
+@media (max-width: 991px) {
+    .navbar-turismo .container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+    
+    .navbar-turismo .navbar-brand {
+        flex-grow: 1;
+        text-align: center;
+        margin: 0 var(--spacing-md);
+    }
+    
+    .navbar-turismo .navbar-collapse {
+        width: 100%;
+        text-align: center;
+        margin-top: var(--spacing-sm);
+    }
+    
+    .navbar-turismo .navbar-nav {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-turismo .navbar-brand {
+        font-size: 1.25rem;
+    }
+}
+
+/* Cards */
+.card-turismo {
+    box-shadow: var(--shadow-sm);
+    border: 1px solid rgba(0, 0, 0, 0.125);
+    transition: box-shadow var(--transition-fast);
+}
+
+.card-turismo:hover {
+    box-shadow: var(--shadow-md);
+}
+
+/* Botones específicos */
+.btn-turismo {
+    background-color: var(--color-turismo);
+    border-color: var(--color-turismo);
+    color: white;
+}
+
+.btn-turismo:hover {
+    background-color: #1565c0;
+    border-color: #1565c0;
+}
+
+/* 4. MÓDULOS ESPECÍFICOS */
+
+/* Instituciones */
+.modulo-instituciones .hero-section {
+    background: linear-gradient(135deg, var(--color-institucion), #9c27b0);
+    color: white;
+    padding: var(--spacing-xl) 0;
+}
+
+/* Admin */
+.modulo-admin .sidebar {
+    background-color: var(--color-admin);
+    min-height: 100vh;
+}
+
+.modulo-admin .btn-admin {
+    background-color: var(--color-admin);
+    border-color: var(--color-admin);
+}
+
+/* Prestador */
+.modulo-prestador .dashboard-stats {
+    background: linear-gradient(135deg, var(--color-prestador), #ff9800);
+    color: white;
+    border-radius: 0.5rem;
+    padding: var(--spacing-lg);
+}
+
+/* 5. UTILIDADES */
+.text-turismo { color: var(--color-turismo); }
+.text-admin { color: var(--color-admin); }
+.text-prestador { color: var(--color-prestador); }
+.text-institucion { color: var(--color-institucion); }
+
+.bg-turismo { background-color: var(--color-turismo); }
+.bg-admin { color: var(--color-admin); }
+.bg-prestador { background-color: var(--color-prestador); }
+.bg-institucion { background-color: var(--color-institucion); }
+
+/* 6. RESPONSIVE */
+@media (max-width: 768px) {
+    .navbar-turismo .navbar-brand {
+        font-size: 1.5rem;
+    }
+    
+    .navbar-turismo .navbar-nav {
+        position: static;
+        margin: var(--spacing-sm) 0 0 0 !important;
+        text-align: center;
+    }
+    
+    h1 {
+        font-size: 1.75rem;
+    }
+    
+    .modulo-instituciones .hero-section {
+        padding: var(--spacing-lg) 0;
+    }
+}
+
+@media (max-width: 576px) {
+    .navbar-turismo .navbar-brand {
+        font-size: 1.25rem;
+    }
+    
+    .card-turismo {
+        margin-bottom: var(--spacing-md);
+    }
+}

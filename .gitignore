@@ -1,0 +1,44 @@
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Flask
+instance/
+.webassets-cache
+*.db
+*.sqlite
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Migration files (descomenta si quieres versionar migraciones)
+# migrations/versions/
+
+# Testing
+.coverage
+htmlcov/
+.pytest_cache/
+
+# Uploads y archivos temporales
+uploads/
+temp/
