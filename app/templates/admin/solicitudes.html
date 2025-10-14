@@ -1,0 +1,130 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitudes Pendientes - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📋 Solicitudes Pendientes</h1>
+    <span class="badge bg-warning fs-6">3 por revisar</span>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <select class="form-select">
+            <option value="">Todas las localidades</option>
+            <option value="ESPERANZA">Solo Esperanza</option>
+            <option value="EXTERNA">Solo Externas</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select">
+            <option value="">Todos los niveles</option>
+            <option value="PRIMARIA">Solo Primaria</option>
+            <option value="SECUNDARIA">Solo Secundaria</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <input type="date" class="form-control" placeholder="Filtrar por fecha">
+    </div>
+</div>
+
+<!-- Lista de Solicitudes -->
+<div class="row">
+    <!-- Solicitud 1 - Ejemplo -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📋 Solicitud #001</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">🏫 Escuela Juan XXIII</h6>
+                <p class="card-text">
+                    <strong>📅 Fecha:</strong> 15/11/2025<br>
+                    <strong>👥 Alumnos:</strong> 25<br>
+                    <strong>📍 Localidad:</strong> Esperanza<br>
+                    <strong>📞 Contacto:</strong> Ana López - 03496-123456<br>
+                    <strong>🎯 Nivel:</strong> Primaria
+                </p>
+                <div class="mb-2">
+                    <strong>🏛️ Prestadores solicitados:</strong>
+                    <div class="mt-1">
+                        <span class="badge bg-info me-1">Museo de la Colonización</span>
+                        <span class="badge bg-info me-1">Sala de extracción de Miel</span>
+                        <span class="badge bg-info">Cuartel de bomberos</span>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-primary btn-sm">📋 Ver Detalles</button>
+                    <a href="/admin/solicitudes/1/horarios" class="btn btn-warning btn-sm">⏰ Asignar Horarios</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solicitud 2 - Ejemplo -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📋 Solicitud #002</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">🏫 Colegio San José</h6>
+                <p class="card-text">
+                    <strong>📅 Fecha:</strong> 20/11/2025<br>
+                    <strong>👥 Alumnos:</strong> 30<br>
+                    <strong>📍 Localidad:</strong> Rafaela<br>
+                    <strong>📞 Contacto:</strong> Pedro García - 03492-987654<br>
+                    <strong>🎯 Nivel:</strong> Secundaria
+                </p>
+                <div class="mb-2">
+                    <strong>🏛️ Prestadores solicitados:</strong>
+                    <div class="mt-1">
+                        <span class="badge bg-info me-1">Fábrica Bourquín</span>
+                        <span class="badge bg-info">Country Pujol</span>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-primary btn-sm">📋 Ver Detalles</button>
+                    <a href="/admin/solicitudes/2/horarios" class="btn btn-warning btn-sm">⏰ Asignar Horarios</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Solicitud 3 - Ejemplo -->
+    <div class="col-md-6 mb-4">
+        <div class="card border-warning">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📋 Solicitud #003</h5>
+            </div>
+            <div class="card-body">
+                <h6 class="card-title">🏫 Escuela 315</h6>
+                <p class="card-text">
+                    <strong>📅 Fecha:</strong> 25/11/2025<br>
+                    <strong>👥 Alumnos:</strong> 40<br>
+                    <strong>📍 Localidad:</strong> Esperanza<br>
+                    <strong>📞 Contacto:</strong> María Rodríguez - 03496-555123<br>
+                    <strong>🎯 Nivel:</strong> Primaria
+                </p>
+                <div class="mb-2">
+                    <strong>🏛️ Prestadores solicitados:</strong>
+                    <div class="mt-1">
+                        <span class="badge bg-info me-1">Museo de la Colonización</span>
+                        <span class="badge bg-info">Biblioteca Municipal</span>
+                    </div>
+                </div>
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button class="btn btn-outline-primary btn-sm">📋 Ver Detalles</button>
+                    <a href="/admin/solicitudes/3/horarios" class="btn btn-warning btn-sm">⏰ Asignar Horarios</a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Mensaje si no hay solicitudes -->
+<div class="alert alert-info d-none" id="no-solicitudes">
+    <h4>ℹ️ No hay solicitudes pendientes</h4>
+    <p>Todas las solicitudes han sido procesadas.</p>
+</div>
+{% endblock %}

@@ -4,7 +4,7 @@ bp = Blueprint('prestador', __name__)
 
 @bp.route('/')
 def dashboard():
-    return "<h1>Panel Prestador</h1><p>Mis visitas confirmadas</p>"
+    return render_template('prestador/dashboard.html')
 
 @bp.route('/login')
 def login():

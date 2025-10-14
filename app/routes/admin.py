@@ -12,7 +12,13 @@ def login():
 
 @bp.route('/solicitudes')
 def solicitudes():
-    return "<h1>Solicitudes Pendientes</h1><p>Lista de solicitudes por confirmar</p>"
+    return render_template('admin/solicitudes.html') 
+
+@bp.route('/solicitudes/<int:id>/horarios')
+def asignar_horarios(id):
+    """Formulario para asignar horarios a una solicitud específica"""
+    # Por ahora usamos datos fijos, después conectamos con la base de datos
+    return render_template('admin/asignar_horarios.html')
 
 @bp.route('/prestadores')
 def prestadores():

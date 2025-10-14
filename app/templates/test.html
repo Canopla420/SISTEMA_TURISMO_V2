@@ -1,0 +1,46 @@
+{% extends "base.html" %}
+
+{% block title %}Test - Turismo Esperanza{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-md-12">
+        <h1>🎉 Sistema funcionando!</h1>
+        <p class="lead">Template base creado correctamente.</p>
+        
+        <div class="card">
+            <div class="card-body">
+                <h5 class="card-title">✅ Progreso del sistema:</h5>
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item">✅ Modelos completos (5 modelos)</li>
+                    <li class="list-group-item">✅ Template base con Bootstrap</li>
+                    <li class="list-group-item">⏳ Panel admin</li>
+                    <li class="list-group-item">⏳ Panel prestador</li>
+                    <li class="list-group-item">⏳ Formularios públicos</li>
+                </ul>
+            </div>
+        </div>
+        
+        <div class="card mt-4">
+            <div class="card-body">
+                <h5 class="card-title">🔧 Modelos implementados:</h5>
+                <div class="row">
+                    <div class="col-md-6">
+                        <ul>
+                            <li><strong>UsuarioAdmin:</strong> Dirección de Turismo</li>
+                            <li><strong>Prestador:</strong> Museos, salas, bomberos</li>
+                            <li><strong>UsuarioPrestador:</strong> Empleados</li>
+                        </ul>
+                    </div>
+                    <div class="col-md-6">
+                        <ul>
+                            <li><strong>SolicitudVisita:</strong> Pedidos de instituciones</li>
+                            <li><strong>VisitaPrestador:</strong> Visitas confirmadas</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

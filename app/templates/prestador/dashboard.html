@@ -1,0 +1,209 @@
+{% extends "base.html" %}
+
+{% block title %}Mis Visitas - {{ prestador_nombre }}{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🏛️ {{ prestador_nombre or "Museo de la Colonización" }} - MIS VISITAS</h1>
+    <div>
+        <span class="badge bg-success fs-6 me-2">5 programadas</span>
+        <span class="badge bg-info fs-6">2 esta semana</span>
+    </div>
+</div>
+
+<!-- Filtros -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <select class="form-select">
+            <option>📅 Todas las fechas</option>
+            <option>Hoy</option>
+            <option>Esta semana</option>
+            <option>Este mes</option>
+        </select>
+    </div>
+    <div class="col-md-3">
+        <select class="form-select">
+            <option>📍 Todas las localidades</option>
+            <option>Esperanza</option>
+            <option>Santa Fe</option>
+            <option>Rafaela</option>
+        </select>
+    </div>
+    <div class="col-md-6">
+        <div class="input-group">
+            <input type="text" class="form-control" placeholder="Buscar por institución...">
+            <button class="btn btn-outline-primary">🔍</button>
+        </div>
+    </div>
+</div>
+
+<!-- Tabla tipo Excel -->
+<div class="card">
+    <div class="card-header bg-primary text-white">
+        <h5 class="mb-0">📋 RESERVAS DEL MUSEO DE LA COLONIZACIÓN</h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover mb-0">
+                <thead class="table-light">
+                    <tr>
+                        <th>DÍA</th>
+                        <th>HORA</th>
+                        <th>INSTITUCIÓN</th>
+                        <th>LOCALIDAD</th>
+                        <th>CANTIDAD</th>
+                        <th>EDAD</th>
+                        <th>CONTACTO</th>
+                        <th>OBSERVACIONES</th>
+                        <th>ACCIONES</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <!-- Martes 07/10 -->
+                    <tr class="table-success">
+                        <td><strong>07/10</strong><br><small>Martes</small></td>
+                        <td><strong>9:30</strong></td>
+                        <td>Colegio Bustamante</td>
+                        <td>Santa Fe</td>
+                        <td><span class="badge bg-primary">35</span></td>
+                        <td>6 años</td>
+                        <td>Ana López<br><small>03496-123456</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-success">✅</button>
+                        </td>
+                    </tr>
+                    <tr class="table-success">
+                        <td></td>
+                        <td><strong>10:00</strong></td>
+                        <td>Colegio Bustamante</td>
+                        <td>Santa Fe</td>
+                        <td><span class="badge bg-primary">35</span></td>
+                        <td>6 años</td>
+                        <td>Ana López<br><small>03496-123456</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-success">✅</button>
+                        </td>
+                    </tr>
+
+                    <!-- Espacio entre días -->
+                    <tr><td colspan="9" class="p-1"></td></tr>
+
+                    <!-- Miércoles 09/10 -->
+                    <tr class="table-warning">
+                        <td><strong>09/10</strong><br><small>Miércoles</small></td>
+                        <td><strong>9:30</strong></td>
+                        <td>Colegio Aduaneros</td>
+                        <td>Santa Fe</td>
+                        <td><span class="badge bg-primary">50</span></td>
+                        <td>6 años</td>
+                        <td>Pedro García<br><small>03492-987654</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-warning">⏳</button>
+                        </td>
+                    </tr>
+                    <tr class="table-warning">
+                        <td></td>
+                        <td><strong>10:00</strong></td>
+                        <td>Colegio della Torre</td>
+                        <td>Santa Fe</td>
+                        <td><span class="badge bg-primary">31</span></td>
+                        <td>8 años</td>
+                        <td>María Rodríguez<br><small>03496-555123</small></td>
+                        <td><small class="text-warning">📝 A la habitación pasada cual de 09:00 pero hecha</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-warning">⏳</button>
+                        </td>
+                    </tr>
+
+                    <!-- Espacio entre días -->
+                    <tr><td colspan="9" class="p-1"></td></tr>
+
+                    <!-- Lunes 14/10 -->
+                    <tr class="table-info">
+                        <td><strong>14/10</strong><br><small>Lunes</small></td>
+                        <td><strong>9:00</strong></td>
+                        <td>Escuela San Martín</td>
+                        <td>Esperanza</td>
+                        <td><span class="badge bg-primary">50</span></td>
+                        <td>4 años</td>
+                        <td>José González<br><small>03496-789123</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-info">📅</button>
+                        </td>
+                    </tr>
+                    <tr class="table-info">
+                        <td></td>
+                        <td><strong>10:00</strong></td>
+                        <td>Escuela San Martín</td>
+                        <td>Esperanza</td>
+                        <td><span class="badge bg-primary">50</span></td>
+                        <td>4 años</td>
+                        <td>José González<br><small>03496-789123</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-info">📅</button>
+                        </td>
+                    </tr>
+
+                    <!-- Martes 15/10 -->
+                    <tr class="table-info">
+                        <td><strong>15/10</strong><br><small>Martes</small></td>
+                        <td><strong>9:00</strong></td>
+                        <td>Escuela San Martín</td>
+                        <td>Esperanza</td>
+                        <td><span class="badge bg-primary">50</span></td>
+                        <td>4 años</td>
+                        <td>José González<br><small>03496-789123</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-info">📅</button>
+                        </td>
+                    </tr>
+                    <tr class="table-info">
+                        <td></td>
+                        <td><strong>10:00</strong></td>
+                        <td>Escuela San Martín</td>
+                        <td>Esperanza</td>
+                        <td><span class="badge bg-primary">50</span></td>
+                        <td>4 años</td>
+                        <td>José González<br><small>03496-789123</small></td>
+                        <td><small class="text-muted">-</small></td>
+                        <td>
+                            <button class="btn btn-sm btn-outline-primary">👁️</button>
+                            <button class="btn btn-sm btn-outline-info">📅</button>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- Leyenda -->
+<div class="row mt-4">
+    <div class="col-md-8">
+        <h6>📊 Leyenda de estados:</h6>
+        <div class="d-flex gap-3">
+            <span class="badge bg-success">Completada</span>
+            <span class="badge bg-warning">En curso</span>
+            <span class="badge bg-info">Programada</span>
+            <span class="badge bg-secondary">Cancelada</span>
+        </div>
+    </div>
+    <div class="col-md-4 text-end">
+        <button class="btn btn-primary">📊 Generar Reporte</button>
+        <button class="btn btn-success">➕ Agregar Observación</button>
+    </div>
+</div>
+{% endblock %}
