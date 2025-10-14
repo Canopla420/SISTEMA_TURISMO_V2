@@ -1,0 +1,282 @@
+{% extends "base.html" %}
+
+{% block title %}Visita a la Ciudad de Esperanza{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-10">
+        <div class="card">
+            <div class="card-header bg-primary text-white text-center">
+                <h3>🏛️ VISITA A LA CIUDAD DE ESPERANZA</h3>
+                <p class="mb-0">DATOS A COMPLETAR POR LA INSTITUCIÓN</p>
+                <small>(completar el formulario y enviarlo a la Dirección de Turismo)</small>
+            </div>
+            <div class="card-body">
+                <form id="solicitud-form">
+                    
+                    <!-- Datos de la Institución -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary border-bottom pb-2">🏫 Datos de la Institución</h5>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Nombre de Institución *</label>
+                            <input type="text" class="form-control" name="nombre_institucion" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Localidad *</label>
+                            <select class="form-select" name="localidad" required id="localidad">
+                                <option value="">Seleccione localidad</option>
+                                <option value="ESPERANZA">Esperanza (Interior)</option>
+                                <option value="SANTA_FE">Santa Fe (Exterior)</option>
+                                <option value="RAFAELA">Rafaela (Exterior)</option>
+                                <option value="RECONQUISTA">Reconquista (Exterior)</option>
+                                <option value="ROSARIO">Rosario (Exterior)</option>
+                                <option value="OTRA">Otra localidad (Exterior)</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Director del establecimiento *</label>
+                            <input type="text" class="form-control" name="director" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Correo electrónico</label>
+                            <input type="email" class="form-control" name="email_director">
+                        </div>
+                        <div class="col-md-6">
+                            <label class="form-label">Teléfono personal</label>
+                            <input type="tel" class="form-control" name="telefono_director">
+                        </div>
+                    </div>
+
+                    <!-- Datos del contingente -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary border-bottom pb-2">👥 Datos del contingente</h5>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Contacto a cargo *</label>
+                            <input type="text" class="form-control" name="contacto_principal" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Teléfono personal *</label>
+                            <input type="tel" class="form-control" name="telefono_principal" required>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Relación con el grupo</label>
+                            <input type="text" class="form-control" name="relacion_principal" placeholder="Ej: Docente">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Contacto suplente</label>
+                            <input type="text" class="form-control" name="contacto_suplente">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Teléfono personal</label>
+                            <input type="tel" class="form-control" name="telefono_suplente">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Relación con el grupo</label>
+                            <input type="text" class="form-control" name="relacion_suplente" placeholder="Ej: Auxiliar">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Nivel *</label>
+                            <select class="form-select" name="nivel" required id="nivel">
+                                <option value="">Seleccione nivel</option>
+                                <option value="INICIAL">Inicial</option>
+                                <option value="PRIMARIA">Primaria</option>
+                                <option value="SECUNDARIA">Secundaria</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Cantidad *</label>
+                            <input type="number" class="form-control" name="cantidad" required min="1" max="100">
+                        </div>
+                        <div class="col-md-4">
+                            <label class="form-label">Edad</label>
+                            <input type="text" class="form-control" name="edad" placeholder="Ej: 8-9 años">
+                        </div>
+                    </div>
+
+                    <!-- Discapacidad -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <label class="form-label">¿Algún alumno/a presenta discapacidad?</label>
+                            <select class="form-select mb-3" name="tiene_discapacidad" id="discapacidad">
+                                <option value="NO">No</option>
+                                <option value="SI">Sí</option>
+                            </select>
+                            <div id="detalle-discapacidad" style="display: none;">
+                                <label class="form-label">En caso afirmativo detalle el tipo de discapacidad e informar si se precisa adaptación:</label>
+                                <textarea class="form-control" name="detalle_discapacidad" rows="3" 
+                                          placeholder="Describa el tipo de discapacidad y adaptaciones necesarias..."></textarea>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Fecha -->
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <label class="form-label">Fecha de la visita *</label>
+                            <input type="date" class="form-control" name="fecha_visita" required>
+                        </div>
+                    </div>
+
+                    <!-- Lugares a visitar -->
+                    <div class="row mb-4">
+                        <div class="col-12">
+                            <h5 class="text-primary border-bottom pb-2">🏛️ SELECCIONE CON UNA X LOS LUGARES A VISITAR</h5>
+                            <div class="alert alert-info">
+                                <strong>Nota:</strong> Los lugares disponibles dependen de su localidad y nivel educativo
+                            </div>
+                        </div>
+                        
+                        <!-- Tabla como el formulario original -->
+                        <div class="col-12">
+                            <div class="table-responsive">
+                                <table class="table table-bordered">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th width="10%">Seleccionar</th>
+                                            <th width="40%">Lugar</th>
+                                            <th width="20%">Hora Grupo 1</th>
+                                            <th width="20%">Hora Grupo 2</th>
+                                            <th width="10%">Observación</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody id="lugares-tabla">
+                                        <!-- Se llena dinámicamente con JavaScript -->
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Botones -->
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                        <button type="button" class="btn btn-secondary" onclick="limpiarFormulario()">
+                            🗑️ Limpiar
+                        </button>
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            📨 Enviar Solicitud
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+// Lugares disponibles según localidad y nivel
+const lugaresPorTipo = {
+    'ESPERANZA_PRIMARIA': [
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Concejo Municipal',
+        'Biblioteca Municipal',
+        'Museo de ciencias naturales',
+        'Cuartel de bomberos Voluntarios',
+        'Sala de extracción de Miel',
+        'Taller de educación Vial en ciudad de los Niños',
+        'Casa de la Colonia - Museo de Arte Héctor Borla'
+    ],
+    'ESPERANZA_SECUNDARIA': [
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Concejo Municipal',
+        'Biblioteca Municipal',
+        'Intendencia',
+        'Museo de ciencias naturales',
+        'Cuartel de bomberos Voluntarios',
+        'Sala de extracción de Miel',
+        'Wöhr química',
+        'Nutriar',
+        'Laboratorio Alecol',
+        'Fábrica de dulce de leche Bourquín',
+        'Country Pujol',
+        'Tanto Antón',
+        'Museo de la Máquina Agrícola',
+        'Casa de la Colonia - Museo de Arte Héctor Borla'
+    ],
+    'EXTERIOR_PRIMARIA': [
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Biblioteca Municipal',
+        'Museo de ciencias naturales',
+        'Cuartel de bomberos Voluntarios',
+        'Sala de extracción de Miel',
+        'Taller de educación Vial en ciudad de los Niños'
+    ],
+    'EXTERIOR_SECUNDARIA': [
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Biblioteca Municipal',
+        'Museo de ciencias naturales',
+        'Cuartel de bomberos Voluntarios',
+        'Sala de extracción de Miel',
+        'Wöhr química',
+        'Nutriar',
+        'Laboratorio Alecol',
+        'Fábrica de dulce de leche Bourquín',
+        'Country Pujol',
+        'Museo de la Máquina Agrícola'
+    ]
+};
+
+function actualizarLugares() {
+    const localidad = document.getElementById('localidad').value;
+    const nivel = document.getElementById('nivel').value;
+    const tabla = document.getElementById('lugares-tabla');
+    
+    tabla.innerHTML = '';
+    
+    if (!localidad || !nivel) return;
+    
+    const esEsperanza = localidad === 'ESPERANZA';
+    const tipo = esEsperanza ? `ESPERANZA_${nivel}` : `EXTERIOR_${nivel}`;
+    const lugares = lugaresPorTipo[tipo] || [];
+    
+    lugares.forEach(lugar => {
+        const fila = document.createElement('tr');
+        fila.innerHTML = `
+            <td class="text-center">
+                <input type="checkbox" name="lugares" value="${lugar}" class="form-check-input">
+            </td>
+            <td>${lugar}</td>
+            <td><input type="time" class="form-control form-control-sm" name="hora1_${lugar.replace(/\s+/g, '_')}"></td>
+            <td><input type="time" class="form-control form-control-sm" name="hora2_${lugar.replace(/\s+/g, '_')}"></td>
+            <td><input type="text" class="form-control form-control-sm" name="obs_${lugar.replace(/\s+/g, '_')}" placeholder="Obs."></td>
+        `;
+        tabla.appendChild(fila);
+    });
+}
+
+// Event listeners
+document.getElementById('localidad').addEventListener('change', actualizarLugares);
+document.getElementById('nivel').addEventListener('change', actualizarLugares);
+
+document.getElementById('discapacidad').addEventListener('change', function() {
+    const detalle = document.getElementById('detalle-discapacidad');
+    detalle.style.display = this.value === 'SI' ? 'block' : 'none';
+});
+
+function limpiarFormulario() {
+    if (confirm('¿Está seguro que desea limpiar el formulario?')) {
+        document.getElementById('solicitud-form').reset();
+        actualizarLugares();
+    }
+}
+
+document.getElementById('solicitud-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const lugaresSeleccionados = document.querySelectorAll('input[name="lugares"]:checked');
+    if (lugaresSeleccionados.length === 0) {
+        alert('Debe seleccionar al menos un lugar para visitar.');
+        return;
+    }
+    
+    alert('Solicitud enviada correctamente. Recibirá confirmación en 48-72 horas.');
+});
+</script>
+{% endblock %}
