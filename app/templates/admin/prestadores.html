@@ -1,0 +1,153 @@
+{% extends "base.html" %}
+
+{% block title %}Prestadores Turísticos - Admin{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>🏛️ Prestadores Turísticos</h1>
+    <a href="{{ url_for('admin.nuevo_prestador') }}" class="btn btn-success">
+        ➕ Nuevo Prestador
+    </a>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h3>{{ prestadores|length }}</h3>
+                <p class="mb-0">📋 Total Prestadores</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h3>{{ prestadores|selectattr('tiene_guia_propio', 'equalto', true)|list|length }}</h3>
+                <p class="mb-0">👨‍🏫 Con Guía Propio</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h3>{{ prestadores|selectattr('acceso_movilidad_reducida', 'equalto', 'Si')|list|length }}</h3>
+                <p class="mb-0">♿ Accesibles</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h3>{{ prestadores|selectattr('tiene_material_digital', 'equalto', true)|list|length }}</h3>
+                <p class="mb-0">💾 Con Material Digital</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Lista de Prestadores -->
+<div class="row">
+    {% for prestador in prestadores %}
+    <div class="col-md-6 mb-4">
+        <div class="card border-primary">
+            <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+                <div>
+                    <h5 class="mb-0">🏛️ {{ prestador.razon_social }}</h5>
+                    <small>CUIT: {{ prestador.cuit or 'No informado' }}</small>
+                </div>
+                <!-- Botón Eliminar -->
+                <form method="POST" action="{{ url_for('admin.eliminar_prestador', id=prestador.id) }}" style="display: inline;">
+                    <button type="submit" class="btn btn-sm btn-outline-light" 
+                            onclick="return confirm('⚠️ ¿ELIMINAR prestador {{ prestador.razon_social }}? Esta acción NO se puede deshacer.')"
+                            title="Eliminar prestador">
+                        🗑️
+                    </button>
+                </form>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p class="mb-1"><strong>📞 Contacto:</strong> {{ prestador.contacto_responsable }}</p>
+                        <p class="mb-1"><strong>📱 Teléfono:</strong> {{ prestador.telefono }}</p>
+                        {% if prestador.email %}
+                        <p class="mb-1"><strong>📧 Email:</strong> {{ prestador.email }}</p>
+                        {% endif %}
+                    </div>
+                    <div class="col-md-6">
+                        {% if prestador.visitantes_maximo %}
+                        <p class="mb-1"><strong>👥 Capacidad:</strong> {{ prestador.visitantes_maximo }} personas</p>
+                        {% endif %}
+                        {% if prestador.duracion_visita %}
+                        <p class="mb-1"><strong>⏱️ Duración:</strong> {{ prestador.duracion_visita }}</p>
+                        {% endif %}
+                        {% if prestador.edades_recomendadas %}
+                        <p class="mb-1"><strong>🎯 Edades:</strong> {{ prestador.edades_recomendadas }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Disponibilidad -->
+                {% if prestador.meses_disponibles %}
+                <div class="mb-2">
+                    <strong>📅 Meses:</strong>
+                    <span class="badge bg-info">{{ prestador.meses_disponibles }}</span>
+                </div>
+                {% endif %}
+                
+                {% if prestador.dias_disponibles %}
+                <div class="mb-2">
+                    <strong>📆 Días:</strong>
+                    <span class="badge bg-secondary">{{ prestador.dias_disponibles }}</span>
+                </div>
+                {% endif %}
+                
+                <!-- Características -->
+                <div class="mb-3">
+                    {% if prestador.tiene_material_digital %}
+                    <span class="badge bg-success me-1">💾 Material Digital</span>
+                    {% endif %}
+                    {% if prestador.tiene_guia_propio %}
+                    <span class="badge bg-primary me-1">👨‍🏫 Guía Propio</span>
+                    {% endif %}
+                    {% if prestador.acceso_movilidad_reducida == 'Si' %}
+                    <span class="badge bg-info me-1">♿ Accesible</span>
+                    {% endif %}
+                </div>
+                
+                <!-- Botones de Acción -->
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <a href="{{ url_for('admin.ver_prestador', id=prestador.id) }}" 
+                       class="btn btn-outline-primary btn-sm">📋 Ver Detalles</a>
+                    <a href="{{ url_for('admin.editar_prestador', id=prestador.id) }}" 
+                       class="btn btn-warning btn-sm">✏️ Editar</a>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- Mensaje si no hay prestadores -->
+{% if not prestadores %}
+<div class="alert alert-info text-center">
+    <h4>ℹ️ No hay prestadores registrados</h4>
+    <p class="mb-3">Aún no se han registrado prestadores turísticos.</p>
+    <a href="{{ url_for('admin.nuevo_prestador') }}" class="btn btn-success">
+        ➕ Registrar Primer Prestador
+    </a>
+</div>
+{% endif %}
+
+<!-- Acciones adicionales -->
+<div class="row mt-4">
+    <div class="col-12 text-center">
+        <a href="{{ url_for('admin.nuevo_prestador') }}" class="btn btn-success me-2">
+            ➕ Nuevo Prestador
+        </a>
+        <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-primary">
+            📋 Ver Solicitudes
+        </a>
+    </div>
+</div>
+{% endblock %}

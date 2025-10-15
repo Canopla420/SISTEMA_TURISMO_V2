@@ -1,0 +1,127 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitud #{{ solicitud.id }} - Detalle{% endblock %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1>📋 Solicitud #{{ solicitud.id }}</h1>
+    <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-secondary">← Volver</a>
+</div>
+
+<div class="row">
+    <div class="col-md-8">
+        <!-- Información de la Institución -->
+        <div class="card mb-4">
+            <div class="card-header bg-primary text-white">
+                <h5 class="mb-0">📍 Información de la Institución</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nombre:</strong> {{ solicitud.nombre_institucion }}</p>
+                        <p><strong>Localidad:</strong> {{ solicitud.localidad }}</p>
+                        <p><strong>Responsable:</strong> {{ solicitud.responsable_nombre }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        <p><strong>Email:</strong> {{ solicitud.responsable_email }}</p>
+                        <p><strong>Teléfono:</strong> {{ solicitud.responsable_telefono }}</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información del Grupo -->
+        <div class="card mb-4">
+            <div class="card-header bg-info text-white">
+                <h5 class="mb-0">👥 Información del Grupo</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <p><strong>Nivel Educativo:</strong> {{ solicitud.nivel_educativo }}</p>
+                        <p><strong>Cantidad de Alumnos:</strong> {{ solicitud.cantidad_alumnos }}</p>
+                    </div>
+                    <div class="col-md-6">
+                        {% if solicitud.edad_promedio %}
+                        <p><strong>Edad Promedio:</strong> {{ solicitud.edad_promedio }}</p>
+                        {% endif %}
+                        {% if solicitud.necesidades_especiales %}
+                        <p><strong>Necesidades Especiales:</strong> {{ solicitud.necesidades_especiales }}</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Información de la Visita -->
+        <div class="card mb-4">
+            <div class="card-header bg-warning text-dark">
+                <h5 class="mb-0">📅 Información de la Visita</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Fecha Solicitada:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') }}</p>
+                <p><strong>Lugares Solicitados:</strong></p>
+                <div class="mb-2">
+                    {% for prestador in solicitud.prestadores_solicitados.split(',') %}
+                    <span class="badge bg-info me-1">{{ prestador.strip() }}</span>
+                    {% endfor %}
+                </div>
+                {% if solicitud.observaciones %}
+                <p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <!-- Estado -->
+        <div class="card mb-4">
+            <div class="card-header bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %} text-{% if solicitud.estado == 'PENDIENTE' %}dark{% else %}white{% endif %}">
+                <h5 class="mb-0">📊 Estado</h5>
+            </div>
+            <div class="card-body">
+                <p><strong>Estado:</strong> 
+                    <span class="badge bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %}">
+                        {{ solicitud.estado }}
+                    </span>
+                </p>
+                <p><strong>Fecha Solicitud:</strong> {{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}</p>
+                {% if solicitud.fecha_respuesta %}
+                <p><strong>Fecha Respuesta:</strong> {{ solicitud.fecha_respuesta.strftime('%d/%m/%Y %H:%M') }}</p>
+                {% endif %}
+                {% if solicitud.motivo_rechazo %}
+                <p><strong>Motivo Rechazo:</strong> {{ solicitud.motivo_rechazo }}</p>
+                {% endif %}
+            </div>
+        </div>
+
+        <!-- Acciones -->
+        {% if solicitud.estado == 'PENDIENTE' %}
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">⚡ Acciones</h5>
+            </div>
+            <div class="card-body">
+                <form method="POST" action="{{ url_for('admin.aprobar_solicitud', id=solicitud.id) }}" class="mb-2">
+                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('¿Aprobar esta solicitud?')">
+                        ✅ Aprobar
+                    </button>
+                </form>
+                
+                <form method="POST" action="{{ url_for('admin.rechazar_solicitud', id=solicitud.id) }}">
+                    <input type="text" name="motivo" class="form-control mb-2" placeholder="Motivo del rechazo" required>
+                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('¿Rechazar esta solicitud?')">
+                        ❌ Rechazar
+                    </button>
+                </form>
+                
+                <hr>
+                <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" class="btn btn-warning w-100">
+                    ⏰ Asignar Horarios
+                </a>
+            </div>
+        </div>
+        {% endif %}
+    </div>
+</div>
+{% endblock %}

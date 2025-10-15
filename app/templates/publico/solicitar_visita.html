@@ -12,7 +12,7 @@
                 <small>(completar el formulario y enviarlo a la Dirección de Turismo)</small>
             </div>
             <div class="card-body">
-                <form id="solicitud-form">
+                <form id="solicitud-form" method="POST" action="{{ url_for('publico.solicitar_visita') }}">
                     
                     <!-- Datos de la Institución -->
                     <div class="row mb-4">
@@ -276,7 +276,8 @@ document.getElementById('solicitud-form').addEventListener('submit', function(e)
         return;
     }
     
-    alert('Solicitud enviada correctamente. Recibirá confirmación en 48-72 horas.');
+    // Enviar formulario a la base de datos
+    this.submit();
 });
 </script>
 {% endblock %}

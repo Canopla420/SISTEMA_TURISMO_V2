@@ -36,4 +36,4 @@ def create_app(config_class=Config):
     return app
 
 # Importar modelos (al final para evitar imports circulares)
-#from app.models import usuario_admin, prestador, usuario_prestador, solicitud_visita, visita_prestador
+from app.models import usuario_admin, prestador, usuario_prestador, solicitud_visita, visita_prestador

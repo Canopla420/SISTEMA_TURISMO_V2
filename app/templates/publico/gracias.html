@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+
+{% block title %}Solicitud Enviada - Turismo Esperanza{% endblock %}
+
+{% block content %}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-body text-center">
+                <div class="mb-4">
+                    <i class="display-1 text-success">✅</i>
+                </div>
+                <h2 class="text-success">¡Solicitud Enviada!</h2>
+                <p class="lead">Su solicitud de visita fue recibida correctamente.</p>
+                <p>La Dirección de Turismo revisará su solicitud y se comunicará con usted en las próximas 48-72 horas para confirmar horarios.</p>
+                <hr>
+                <p class="small text-muted">
+                    <strong>¿Consultas?</strong><br>
+                    📧 turismo@esperanza.gov.ar<br>
+                    📞 03496-421234
+                </p>
+                <a href="{{ url_for('publico.solicitar_visita') }}" class="btn btn-primary">
+                    📝 Nueva Solicitud
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

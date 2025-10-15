@@ -1,0 +1,112 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard Admin - Turismo Esperanza{% endblock %}
+
+{% block content %}
+<div class="row">
+    <div class="col-12">
+        <h1 class="mb-4">📊 Panel de Administración</h1>
+        <p class="lead">Gestión de solicitudes de visitas turísticas</p>
+    </div>
+</div>
+
+<!-- Estadísticas -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h2>{{ total }}</h2>
+                <p class="mb-0">📋 Total Solicitudes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-warning text-dark">
+            <div class="card-body text-center">
+                <h2>{{ pendientes }}</h2>
+                <p class="mb-0">⏳ Pendientes</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h2>{{ aprobadas }}</h2>
+                <p class="mb-0">✅ Aprobadas</p>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-3">
+        <div class="card bg-danger text-white">
+            <div class="card-body text-center">
+                <h2>{{ rechazadas }}</h2>
+                <p class="mb-0">❌ Rechazadas</p>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Acciones Rápidas -->
+<div class="row">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5>🚀 Acciones Rápidas</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-primary w-100">
+                            📋 Ver Todas las Solicitudes
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.prestadores') }}" class="btn btn-info w-100">
+                            🏛️ Gestionar Prestadores
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('admin.reportes') }}" class="btn btn-secondary w-100">
+                            📊 Ver Reportes
+                        </a>
+                    </div>
+                    <div class="col-md-6 mb-2">
+                        <a href="{{ url_for('publico.solicitar_visita') }}" class="btn btn-success w-100">
+                            📝 Nueva Solicitud (Público)
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-4">
+        <div class="card">
+            <div class="card-header">
+                <h5>📈 Estado del Sistema</h5>
+            </div>
+            <div class="card-body">
+                <div class="mb-3">
+                    <strong>🔄 Estado General:</strong>
+                    {% if pendientes > 0 %}
+                    <span class="badge bg-warning">{{ pendientes }} por revisar</span>
+                    {% else %}
+                    <span class="badge bg-success">Todo al día</span>
+                    {% endif %}
+                </div>
+                
+                <div class="mb-3">
+                    <strong>📅 Hoy:</strong>
+                    <p class="small mb-0">Sistema funcionando correctamente</p>
+                </div>
+                
+                {% if pendientes > 0 %}
+                <div class="alert alert-warning py-2">
+                    <small>⚠️ Hay {{ pendientes }} solicitudes esperando tu revisión</small>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
