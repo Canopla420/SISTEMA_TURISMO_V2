@@ -62,8 +62,8 @@
                 <p><strong>Fecha Solicitada:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') }}</p>
                 <p><strong>Lugares Solicitados:</strong></p>
                 <div class="mb-2">
-                    {% for prestador in solicitud.prestadores_solicitados.split(',') %}
-                    <span class="badge bg-info me-1">{{ prestador.strip() }}</span>
+                    {% for lugar in lugares %}
+                    <span class="badge bg-info me-1">{{ lugar }}</span>
                     {% endfor %}
                 </div>
                 {% if solicitud.observaciones %}

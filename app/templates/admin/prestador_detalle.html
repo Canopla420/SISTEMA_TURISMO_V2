@@ -1,0 +1,11 @@
+<h2>Detalle del Prestador</h2>
+<ul>
+    <li><strong>Razón social:</strong> {{ prestador.razon_social }}</li>
+    <li><strong>Contacto responsable:</strong> {{ prestador.contacto_responsable }}</li>
+    <li><strong>Teléfono:</strong> {{ prestador.telefono }}</li>
+    <li><strong>Email:</strong> {{ prestador.email }}</li>
+    <li><strong>Contraseña:</strong> {{ prestador.password_hash }}</li>
+    <li><strong>Contraseña:</strong>    </li>
+    <!-- Agregá otros campos si querés -->
+</ul>
+<a href="{{ url_for('admin.prestadores') }}">Volver a la lista</a>

@@ -1,0 +1,15 @@
+<h2>{{ accion }} Prestador</h2>
+<form method="POST" action="{{ url_for('admin.crear_prestador') }}">
+    <label>Razón social:</label>
+    <input type="text" name="razon_social" required><br>
+    <label>Contacto responsable:</label>
+    <input type="text" name="contacto_responsable" required><br>
+    <label>Teléfono:</label>
+    <input type="text" name="telefono" required><br>
+    <label>Email:</label>
+    <input type="email" name="email" required><br>
+    <label>Contraseña:</label>
+    <input type="password" name="password" required><br>
+    <!-- Agregá otros campos si querés -->
+    <button type="submit">Crear</button>
+</form>

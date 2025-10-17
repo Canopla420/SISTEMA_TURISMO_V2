@@ -1,0 +1,29 @@
+{% extends "base.html" %}
+{% block title %}Mis Visitas{% endblock %}
+{% block content %}
+<h2>Mis visitas asignadas</h2>
+<table class="table">
+    <thead>
+        <tr>
+            <th>Institución</th>
+            <th>Fecha</th>
+            <th>Hora inicio</th>
+            <th>Hora fin</th>
+            <th>Grupo</th>
+            <th>Observaciones</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for visita in visitas %}
+        <tr>
+            <td>{{ visita.solicitud.nombre_institucion }}</td>
+            <td>{{ visita.solicitud.fecha }}</td>
+            <td>{{ visita.hora_inicio }}</td>
+            <td>{{ visita.hora_fin }}</td>
+            <td>{{ visita.grupo }}</td>
+            <td>{{ visita.observaciones }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

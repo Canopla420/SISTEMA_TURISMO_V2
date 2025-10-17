@@ -1,4 +1,8 @@
-from flask import Blueprint, render_template
+from flask import Blueprint, render_template, request, redirect, url_for, flash
+from flask_login import login_user, login_required, current_user
+from app.models.prestador import Prestador
+from werkzeug.security import check_password_hash
+from app.models.visita_prestador import VisitaPrestador
 
 bp = Blueprint('prestador', __name__)
 
@@ -6,13 +10,25 @@ bp = Blueprint('prestador', __name__)
 def dashboard():
     return render_template('prestador/dashboard.html')
 
-@bp.route('/login')
+@bp.route('/login', methods=['GET', 'POST'])
 def login():
-    return "<h1>Login Prestador</h1><p>Formulario de login para prestadores</p>"
+    if request.method == 'POST':
+        email = request.form['email']
+        password = request.form['password']
+        prestador = Prestador.query.filter_by(email=email).first()
+        if prestador and check_password_hash(prestador.password_hash, password):
+            login_user(prestador)
+            flash('Ingreso exitoso', 'success')
+            return redirect(url_for('prestador.mis_visitas'))
+        else:
+            flash('Correo o contraseña incorrectos', 'danger')
+    return render_template('prestador/login.html')
 
-@bp.route('/visitas')
-def visitas():
-    return "<h1>Mis Visitas</h1><p>Lista de todas mis visitas confirmadas</p>"
+@bp.route('/mis-visitas')
+@login_required
+def mis_visitas():
+    visitas = VisitaPrestador.query.filter_by(prestador_id=current_user.id).all()
+    return render_template('prestador/mis_visitas.html', visitas=visitas)
 
 @bp.route('/perfil')
 def perfil():

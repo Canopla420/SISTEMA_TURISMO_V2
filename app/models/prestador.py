@@ -1,8 +1,9 @@
 from app import db
 from datetime import datetime
 import json
+from flask_login import UserMixin
 
-class Prestador(db.Model):
+class Prestador(db.Model, UserMixin):
     """Prestadores turísticos con datos completos para validación de solicitudes"""
     
     id = db.Column(db.Integer, primary_key=True)
@@ -16,6 +17,9 @@ class Prestador(db.Model):
     telefono = db.Column(db.String(30), nullable=False)
     email = db.Column(db.String(120))
     
+    #Hash contraseña
+    password_hash = db.Column(db.String(128))
+
     # DESCRIPCIÓN DEL SERVICIO
     descripcion_visita = db.Column(db.Text)
     tiene_material_digital = db.Column(db.Boolean, default=False)

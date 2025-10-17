@@ -1,13 +1,14 @@
 from flask import Flask
 from flask_sqlalchemy import SQLAlchemy
 from flask_migrate import Migrate
-#from flask_login import LoginManager
+from flask_login import LoginManager
 from flask_mail import Mail
 from config import Config
 
+
 db = SQLAlchemy()
 migrate = Migrate()
-#login = LoginManager()
+login = LoginManager()
 mail = Mail()
 
 def create_app(config_class=Config):
@@ -16,7 +17,8 @@ def create_app(config_class=Config):
     
     db.init_app(app)
     migrate.init_app(app, db)
-    #login.init_app(app)
+    login.init_app(app)
+    app.login_manager = login
     mail.init_app(app)
     
     # Registrar blueprints - SOLO MAIN por ahora
@@ -35,5 +37,11 @@ def create_app(config_class=Config):
 
     return app
 
-# Importar modelos (al final para evitar imports circulares)
+from app.models.prestador import Prestador
 from app.models import usuario_admin, prestador, usuario_prestador, solicitud_visita, visita_prestador
+
+@login.user_loader
+def load_user(user_id):
+    return Prestador.query.get(int(user_id))
+
+

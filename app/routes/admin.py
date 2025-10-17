@@ -3,6 +3,12 @@ from app.models.solicitud_visita import SolicitudVisita
 from app import db
 from app.models.prestador import Prestador
 from datetime import datetime
+from werkzeug.security import generate_password_hash
+from app.models.visita_prestador import VisitaPrestador
+from app.models.prestador import Prestador
+from app.models.visita_prestador import VisitaPrestador
+import json
+
 
 bp = Blueprint('admin', __name__)
 
@@ -30,13 +36,16 @@ def login():
 def solicitudes():
     """Lista todas las solicitudes de visitas"""
     solicitudes = SolicitudVisita.query.order_by(SolicitudVisita.fecha_solicitud.desc()).all()
+    for solicitud in solicitudes:
+        solicitud.lugares = json.loads(solicitud.prestadores_solicitados) if solicitud.prestadores_solicitados else []
     return render_template('admin/solicitudes.html', solicitudes=solicitudes)
 
 @bp.route('/solicitud/<int:id>')
 def ver_solicitud(id):
     """Ver detalles de una solicitud específica"""
     solicitud = SolicitudVisita.query.get_or_404(id)
-    return render_template('admin/solicitud_detalle.html', solicitud=solicitud)
+    lugares = json.loads(solicitud.prestadores_solicitados) if solicitud.prestadores_solicitados else []
+    return render_template('admin/solicitud_detalle.html', solicitud=solicitud, lugares=lugares)
 
 @bp.route('/solicitud/<int:id>/aprobar', methods=['POST'])
 def aprobar_solicitud(id):
@@ -45,6 +54,23 @@ def aprobar_solicitud(id):
         solicitud = SolicitudVisita.query.get_or_404(id)
         solicitud.estado = 'APROBADA'
         solicitud.fecha_respuesta = datetime.now()
+
+        prestadores_nombres = solicitud.get_prestadores_seleccionados()  # Este método debe devolver la lista de nombres
+
+        for nombre in prestadores_nombres:
+            prestador = Prestador.query.filter_by(razon_social=nombre).first()
+            if prestador:
+                visita = VisitaPrestador(
+                    solicitud_id=solicitud.id,
+                    prestador_id=prestador.id,
+                    fecha_confirmada=solicitud.fecha_solicitud,  # Temporal, se actualizará al asignar horarios
+                    hora_inicio=datetime.strptime(solicitud.horario_preferido.split('-')[0].strip(), '%H:%M').time() if solicitud.horario_preferido else datetime.strptime('10:00', '%H:%M').time(),
+                    hora_fin=datetime.strptime(solicitud.horario_preferido.split('-')[1].strip(), '%H:%M').time() if solicitud.horario_preferido else None,
+                    grupo=1,
+                    observaciones_prestador=solicitud.observaciones
+                )
+                db.session.add(visita)
+
         db.session.commit()
         flash('✅ Solicitud aprobada correctamente', 'success')
     except Exception as e:
@@ -83,26 +109,42 @@ def asignar_horarios(id):
 
 @bp.route('/solicitudes/<int:id>/horarios', methods=['POST'])
 def guardar_horarios(id):
-    """Guardar horarios asignados a una solicitud"""
+    """Guardar horarios asignados a una solicitud (dinámico por prestador)"""
     try:
         solicitud = SolicitudVisita.query.get_or_404(id)
-        
-        # Aquí procesarías los horarios del formulario
-        horario_inicio = request.form.get('horario_inicio')
-        horario_fin = request.form.get('horario_fin')
-        prestadores_asignados = request.form.getlist('prestadores')
-        
-        # Actualizar solicitud con horarios (esto depende de tu modelo)
-        solicitud.horario_preferido = f"{horario_inicio} - {horario_fin}"
-        solicitud.estado = 'CONFIRMADA'
-        
-        db.session.commit()
-        flash('⏰ Horarios asignados correctamente', 'success')
-        
+        horarios_prestadores = []
+        # Obtener la lista de prestadores solicitados (por ejemplo: ['Museo de la Colonización', 'Sala de extracción de Miel', ...])
+        prestadores = solicitud.get_prestadores_seleccionados()  # Este método debe devolver la lista de nombres
+
+        for nombre in prestadores:
+            # Usar el nombre para buscar los campos en el formulario
+            hora_inicio = request.form.get(f'{nombre}_inicio')
+            hora_fin = request.form.get(f'{nombre}_fin')
+            grupo = request.form.get(f'{nombre}_grupo')
+            observaciones = request.form.get(f'{nombre}_obs')
+
+            if hora_inicio and hora_fin:
+                horarios_prestadores.append({
+                    'prestador_nombre': nombre,
+                    'hora_inicio': hora_inicio,
+                    'hora_fin': hora_fin,
+                    'grupo': grupo,
+                    'observaciones': observaciones
+                })
+
+        print("Horarios prestadores recibidos:", horarios_prestadores)  # Debugging line
+
+        # Confirmar la solicitud y crear las visitas por prestador
+        ok = solicitud.confirmar_con_horarios(horarios_prestadores)
+        if ok:
+            flash('⏰ Horarios asignados y visitas creadas correctamente', 'success')
+        else:
+            flash('❌ Error al asignar horarios', 'error')
+
     except Exception as e:
         flash(f'❌ Error al asignar horarios: {str(e)}', 'error')
         db.session.rollback()
-    
+
     return redirect(url_for('admin.ver_solicitud', id=id))
 
 @bp.route('/solicitud/<int:id>/eliminar', methods=['POST'])
@@ -114,7 +156,12 @@ def eliminar_solicitud(id):
         # Guardar datos para el mensaje de confirmación
         nombre_institucion = solicitud.nombre_institucion
         solicitud_id = solicitud.id
-        
+
+        # Eliminar las visitas asociadas
+        visitas = VisitaPrestador.query.filter_by(solicitud_id=solicitud.id).all()
+        for visita in visitas:
+            db.session.delete(visita)
+
         # Eliminar de la base de datos
         db.session.delete(solicitud)
         db.session.commit()
@@ -151,6 +198,7 @@ def crear_prestador():
             contacto_responsable=request.form.get('contacto_responsable'),
             telefono=request.form.get('telefono'),
             email=request.form.get('email'),
+            password_hash=generate_password_hash(request.form.get('password')),
             descripcion_visita=request.form.get('descripcion_visita'),
             tiene_material_digital=bool(request.form.get('tiene_material_digital')),
             meses_disponibles=request.form.get('meses_disponibles'),

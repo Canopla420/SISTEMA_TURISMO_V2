@@ -168,60 +168,69 @@
 
 <script>
 // Lugares disponibles según localidad y nivel
-const lugaresPorTipo = {
-    'ESPERANZA_PRIMARIA': [
-        'Museo de la Colonización',
-        'Casco Histórico',
-        'Concejo Municipal',
-        'Biblioteca Municipal',
-        'Museo de ciencias naturales',
-        'Cuartel de bomberos Voluntarios',
-        'Sala de extracción de Miel',
-        'Taller de educación Vial en ciudad de los Niños',
-        'Casa de la Colonia - Museo de Arte Héctor Borla'
-    ],
-    'ESPERANZA_SECUNDARIA': [
-        'Museo de la Colonización',
-        'Casco Histórico',
-        'Concejo Municipal',
-        'Biblioteca Municipal',
-        'Intendencia',
-        'Museo de ciencias naturales',
-        'Cuartel de bomberos Voluntarios',
-        'Sala de extracción de Miel',
-        'Wöhr química',
-        'Nutriar',
-        'Laboratorio Alecol',
-        'Fábrica de dulce de leche Bourquín',
-        'Country Pujol',
-        'Tanto Antón',
-        'Museo de la Máquina Agrícola',
-        'Casa de la Colonia - Museo de Arte Héctor Borla'
-    ],
-    'EXTERIOR_PRIMARIA': [
-        'Museo de la Colonización',
-        'Casco Histórico',
-        'Biblioteca Municipal',
-        'Museo de ciencias naturales',
-        'Cuartel de bomberos Voluntarios',
-        'Sala de extracción de Miel',
-        'Taller de educación Vial en ciudad de los Niños'
-    ],
-    'EXTERIOR_SECUNDARIA': [
-        'Museo de la Colonización',
-        'Casco Histórico',
-        'Biblioteca Municipal',
-        'Museo de ciencias naturales',
-        'Cuartel de bomberos Voluntarios',
-        'Sala de extracción de Miel',
-        'Wöhr química',
-        'Nutriar',
-        'Laboratorio Alecol',
-        'Fábrica de dulce de leche Bourquín',
-        'Country Pujol',
-        'Museo de la Máquina Agrícola'
-    ]
-};
+    const lugaresPorTipo = {
+        'Primaria_Interior': [
+            'Museo de la Colonización',
+            'Casco Histórico',
+            'Museo de Ciencias Naturales',
+            'Cuartel de Bomberos Voluntarios',
+            'Sala de Extracción de Miel',
+            'Fábrica de Dulce de Leche Bourquín',
+            'Country Pujol',
+            'Tanto Antón',
+            'Emax Cine',
+            'Biblioteca Municipal',
+            'Museo de la Máquina Agrícola',
+            'Taller de Educación Vial (Ciudad de los Niños)',
+            'Casa de la Colonia - Museo de Arte H. Borla',
+            'Concejo Municipal',
+            'Intendencia'
+        ],
+        'Primaria_Exterior': [
+            'Museo de la Colonización',
+            'Casco Histórico',
+            'Museo de Ciencias Naturales',
+            'Cuartel de Bomberos Voluntarios',
+            'Sala de Extracción de Miel',
+            'Fábrica de Dulce de Leche Bourquín',
+            'Country Pujol',
+            'Emax Cine',
+            'Museo de la Máquina Agrícola',
+            'Casa de la Colonia - Museo de Arte H. Borla'
+
+        ],
+        'Secundaria_Interior': [
+            'Museo de la Colonización',
+            'Casco Histórico',
+            'Museo de Ciencias Naturales',
+            'Cuartel de Bomberos Voluntarios',
+            'Sala de Extracción de Miel',
+            'Fábrica de Dulce de Leche Bourquín',
+            'Country Pujol',
+            'Tanto Antón',
+            'Emax Cine',
+            'Biblioteca Municipal',
+            'Museo de la Máquina Agrícola',
+            'Casa de la Colonia - Museo de Arte H. Borla',
+            'Laboratorio Alecol',
+            'Concejo Municipal',
+            'Intendencia',
+            'Taller de Educación Vial (Ciudad de los Niños)'
+        ],
+
+        'Secundaria_Exterior': [
+            'Museo de la Colonización',
+            'Casco Histórico',
+            'Museo de Ciencias Naturales',
+            'Cuartel de Bomberos Voluntarios',
+            'Sala de Extracción de Miel',
+            'Fábrica de Dulce de Leche Bourquín',
+            'Country Pujol',
+            'Emax Cine',
+            'Museo de la Máquina Agrícola',
+            'Casa de la Colonia - Museo de Arte H. Borla'
+        ]
+    };
 
 function actualizarLugares() {
     const localidad = document.getElementById('localidad').value;
@@ -232,9 +241,12 @@ function actualizarLugares() {
     
     if (!localidad || !nivel) return;
     
-    const esEsperanza = localidad === 'ESPERANZA';
-    const tipo = esEsperanza ? `ESPERANZA_${nivel}` : `EXTERIOR_${nivel}`;
-    const lugares = lugaresPorTipo[tipo] || [];
+    // Unificamos la clave como en el backend
+    const tipoLocalidad = (localidad === 'ESPERANZA') ? 'Interior' : 'Exterior';
+    const tipoNivel = (nivel === 'PRIMARIA') ? 'Primaria' : (nivel === 'SECUNDARIA' ? 'Secundaria' : nivel);
+    const clave = `${tipoNivel}_${tipoLocalidad}`; // Ejemplo: "Primaria_Interior"
+    
+    const lugares = lugaresPorTipo[clave] || [];
     
     lugares.forEach(lugar => {
         const fila = document.createElement('tr');

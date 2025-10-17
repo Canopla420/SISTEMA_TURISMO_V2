@@ -11,162 +11,82 @@
 <!-- Información de la Solicitud -->
 <div class="card mb-4">
     <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">📋 Solicitud #001 - Escuela Juan XXIII</h5>
+        <h5 class="mb-0">📋 Solicitud #{{ solicitud.id }} - {{ solicitud.nombre_institucion }}</h5>
     </div>
     <div class="card-body">
         <div class="row">
             <div class="col-md-6">
-                <p><strong>📅 Fecha solicitada:</strong> 15/11/2025</p>
-                <p><strong>👥 Cantidad de alumnos:</strong> 25</p>
-                <p><strong>📍 Localidad:</strong> Esperanza</p>
-                <p><strong>🎯 Nivel:</strong> Primaria (6 años)</p>
+                <p><strong>Fecha solicitada:</strong> {{ fecha_visita }}</p>
+                <p><strong>Cantidad de alumnos:</strong> {{ solicitud.cantidad_alumnos }}</p>
+                <p><strong>Localidad:</strong> {{ solicitud.localidad }}</p>
+                <p><strong>Nivel:</strong> {{ solicitud.tipo_institucion }}</p>
             </div>
             <div class="col-md-6">
-                <p><strong>📞 Contacto:</strong> Ana López</p>
-                <p><strong>☎️ Teléfono:</strong> 03496-123456</p>
-                <p><strong>⏰ Horario preferido:</strong> Mañana</p>
-                <p><strong>📝 Observaciones:</strong> Grupo muy activo</p>
+                <p><strong>Contacto:</strong> {{ solicitud.contacto }}</p>
+                <p><strong>Teléfono:</strong> {{ solicitud.telefono }}</p>
+                <p><strong>Horario preferido:</strong> {{ solicitud.horario_preferido }}</p>
+                <p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>
             </div>
         </div>
     </div>
 </div>
 
 <!-- Formulario de Asignación de Horarios -->
-<form id="asignar-horarios-form">
+<form id="asignar-horarios-form" method="POST" action="{{ url_for('admin.guardar_horarios', id=solicitud.id) }}">
     <div class="card mb-4">
         <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">🏛️ Prestadores Solicitados - Coordinar Horarios</h5>
+            <h5 class="mb-0">Prestadores Solicitados - Coordinar Horarios</h5>
         </div>
         <div class="card-body">
-            
-            <!-- Prestador 1: Museo -->
+            {% for prestador in solicitud.get_prestadores_seleccionados() %}
             <div class="row mb-4 p-3 border rounded bg-light">
                 <div class="col-md-4">
-                    <h6 class="text-primary">🏛️ Museo de la Colonización</h6>
-                    <p class="small text-muted mb-0">Capacidad: 50 personas</p>
-                    <p class="small text-muted">Duración típica: 1 hora</p>
+                    <h6 class="text-primary">{{ prestador }}</h6>
                 </div>
                 <div class="col-md-8">
                     <div class="row">
                         <div class="col-md-3">
                             <label class="form-label">Hora inicio:</label>
-                            <input type="time" class="form-control" name="museo_inicio" value="10:00">
+                            <input type="time" class="form-control" name="{{ prestador }}_inicio">
                         </div>
                         <div class="col-md-3">
                             <label class="form-label">Hora fin:</label>
-                            <input type="time" class="form-control" name="museo_fin" value="11:00">
+                            <input type="time" class="form-control" name="{{ prestador }}_fin">
                         </div>
                         <div class="col-md-2">
                             <label class="form-label">Grupo:</label>
-                            <select class="form-select" name="museo_grupo">
+                            <select class="form-select" name="{{ prestador }}_grupo">
                                 <option value="1">Grupo 1</option>
                                 <option value="2">Grupo 2</option>
                             </select>
                         </div>
                         <div class="col-md-4">
                             <label class="form-label">Observaciones:</label>
-                            <input type="text" class="form-control" name="museo_obs" placeholder="Ej: Usar entrada principal">
+                            <input type="text" class="form-control" name="{{ prestador }}_obs" placeholder="Observaciones">
                         </div>
                     </div>
                 </div>
             </div>
-
-            <!-- Prestador 2: Sala de Miel -->
-            <div class="row mb-4 p-3 border rounded bg-light">
-                <div class="col-md-4">
-                    <h6 class="text-primary">🍯 Sala de extracción de Miel</h6>
-                    <p class="small text-muted mb-0">Capacidad: 30 personas</p>
-                    <p class="small text-muted">Duración típica: 45 min</p>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="form-label">Hora inicio:</label>
-                            <input type="time" class="form-control" name="miel_inicio" value="11:30">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hora fin:</label>
-                            <input type="time" class="form-control" name="miel_fin" value="12:15">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Grupo:</label>
-                            <select class="form-select" name="miel_grupo">
-                                <option value="1">Grupo 1</option>
-                                <option value="2">Grupo 2</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Observaciones:</label>
-                            <input type="text" class="form-control" name="miel_obs" placeholder="Ej: Traer delantales">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Prestador 3: Bomberos -->
-            <div class="row mb-4 p-3 border rounded bg-light">
-                <div class="col-md-4">
-                    <h6 class="text-primary">🚒 Cuartel de bomberos Voluntarios</h6>
-                    <p class="small text-muted mb-0">Capacidad: 40 personas</p>
-                    <p class="small text-muted">Duración típica: 1 hora</p>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="form-label">Hora inicio:</label>
-                            <input type="time" class="form-control" name="bomberos_inicio" value="14:00">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hora fin:</label>
-                            <input type="time" class="form-control" name="bomberos_fin" value="15:00">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Grupo:</label>
-                            <select class="form-select" name="bomberos_grupo">
-                                <option value="1">Grupo 1</option>
-                                <option value="2">Grupo 2</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Observaciones:</label>
-                            <input type="text" class="form-control" name="bomberos_obs" placeholder="Ej: Ver camiones">
-                        </div>
-                    </div>
-                </div>
-            </div>
-
+            {% endfor %}
         </div>
     </div>
 
     <!-- Resumen y Acciones -->
     <div class="card mb-4">
         <div class="card-header bg-success text-white">
-            <h5 class="mb-0">📋 Resumen del Itinerario</h5>
+            <h5 class="mb-0">Resumen del Itinerario</h5>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-8">
-                    <h6>🗓️ Itinerario coordinado para el 15/11/2025:</h6>
+                    <h6>Itinerario coordinado para {{ solicitud.fecha }}:</h6>
                     <ul class="list-group list-group-flush">
-                        <li class="list-group-item">
-                            <strong>10:00 - 11:00</strong> → 🏛️ Museo de la Colonización (Grupo 1)
-                        </li>
-                        <li class="list-group-item">
-                            <strong>11:30 - 12:15</strong> → 🍯 Sala de extracción de Miel (Grupo 1)
-                        </li>
-                        <li class="list-group-item">
-                            <strong>14:00 - 15:00</strong> → 🚒 Cuartel de bomberos Voluntarios (Grupo 1)
-                        </li>
+                        <!-- Podés mostrar el itinerario dinámicamente si tenés los horarios asignados -->
                     </ul>
                 </div>
                 <div class="col-md-4">
-                    <h6>📊 Información del grupo:</h6>
-                    <p><strong>Total:</strong> 25 alumnos + 3 docentes</p>
-                    <p><strong>Duración total:</strong> 5 horas</p>
-                    <p><strong>Tiempo libre:</strong> 12:15 - 14:00 (1h45m)</p>
-                    <div class="alert alert-info small">
-                        💡 <strong>Sugerencia:</strong> Tiempo libre ideal para almorzar
-                    </div>
+                    <h6>Información del grupo:</h6>
+                    <p><strong>Total:</strong> {{ solicitud.cantidad_alumnos }} alumnos + {{ solicitud.cantidad_docentes|default(0) }} docentes</p>
                 </div>
             </div>
         </div>
@@ -184,15 +104,5 @@
 function guardarBorrador() {
     alert('Borrador guardado. Puede continuar coordinando más tarde.');
 }
-
-document.getElementById('asignar-horarios-form').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (confirm('¿Confirmar horarios y crear las visitas para los prestadores?')) {
-        // Aquí iría la lógica para enviar los datos al backend
-        alert('¡Visita confirmada! Se han creado las asignaciones para cada prestador.');
-        window.location.href = '/admin/solicitudes';
-    }
-});
 </script>
 {% endblock %}

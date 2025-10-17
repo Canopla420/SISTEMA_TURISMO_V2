@@ -76,11 +76,11 @@
                     {% endif %}
                 </p>
                 <div class="mb-2">
-                    <strong>🏛️ Prestadores solicitados:</strong>
-                    <div class="mt-1">
-                        {% for prestador in solicitud.prestadores_solicitados.split(',') %}
-                        <span class="badge bg-info me-1">{{ prestador.strip() }}</span>
-                        {% endfor %}
+                <strong>Prestadores solicitados:</strong>
+                    <div>
+                    {% for lugar in solicitud.lugares %}
+                        <span class="badge bg-info me-1">{{ lugar }}</span>
+                    {% endfor %}
                     </div>
                 </div>
                 <div class="mb-3">

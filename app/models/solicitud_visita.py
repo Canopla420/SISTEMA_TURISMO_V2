@@ -1,6 +1,6 @@
 from app import db
-from datetime import datetime
 import json
+from datetime import datetime
 
 class SolicitudVisita(db.Model):
     """Solicitudes de visitas enviadas por instituciones educativas"""
@@ -85,11 +85,16 @@ class SolicitudVisita(db.Model):
         """Confirma la solicitud Y crea las VisitaPrestador automáticamente"""
         from app.models.visita_prestador import VisitaPrestador
         from app.models.prestador import Prestador
-        
+
+        print("Entrando a confirmar_con_horarios")  # <-- Print 1
+
         if not self.puede_ser_confirmada():
+            print("No puede ser confirmada")        # <-- Print 2
             return False
         
         try:
+            print("Dentro del try, creando visitas")  # <-- Print 3
+
             # 1. Cambiar estado de la solicitud
             self.estado = 'CONFIRMADA'
             self.fecha_respuesta = datetime.utcnow()
@@ -102,16 +107,26 @@ class SolicitudVisita(db.Model):
                 #     'hora_fin': '11:00',
                 #     'grupo': 1
                 # }
-                
+                print("Creando visita para:", horario_data)
+
                 prestador = Prestador.query.filter_by(
                     razon_social=horario_data['prestador_nombre']
                 ).first()
-                
+            
+        
                 if prestador:
+                    print("Datos visita:", {
+                        "solicitud_id": self.id,
+                        "prestador_id": prestador.id,
+                        "fecha_confirmada": self.fecha_solicitada,
+                        "hora_inicio": horario_data['hora_inicio'],
+                        "hora_fin": horario_data.get('hora_fin'),
+                        "grupo": horario_data.get('grupo', 1)
+                    })
                     visita = VisitaPrestador()
                     visita.solicitud_id = self.id
                     visita.prestador_id = prestador.id
-                    visita.fecha_confirmada = self.fecha_solicitada
+                    visita.fecha_confirmada = self.fecha_solicitada.date() if hasattr(self.fecha_solicitada, "date") else self.fecha_solicitada
                     visita.hora_inicio = datetime.strptime(horario_data['hora_inicio'], '%H:%M').time()
                     if horario_data.get('hora_fin'):
                         visita.hora_fin = datetime.strptime(horario_data['hora_fin'], '%H:%M').time()
@@ -122,9 +137,11 @@ class SolicitudVisita(db.Model):
             
             # 3. Guardar todo
             db.session.commit()
+            print("Solicitud confirmada con horarios y visitas creadas.")
             return True
             
         except Exception as e:
+            print("Error al confirmar solicitud con horarios:", e)
             db.session.rollback()
             return False
     

@@ -1,9 +1,83 @@
+import json
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from app.models.solicitud_visita import SolicitudVisita
 from app import db
 from datetime import datetime
 
+
 bp = Blueprint('publico', __name__)
+
+PRESTADORES_FILTRO = {
+    ("Primaria", "Interior"): [
+        # Prestadores para Primaria de Esperanza
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Museo de Ciencias Naturales',
+        'Cuartel de Bomberos Voluntarios',
+        'Sala de Extracción de Miel',
+        'Fábrica de Dulce de Leche Bourquín',
+        'Country Pujol',
+        'Tanto Antón',
+        'Emax Cine',
+        'Biblioteca Municipal',
+        'Museo de la Máquina Agrícola',
+        'Taller de Educación Vial (Ciudad de los Niños)',
+        'Casa de la Colonia - Museo de Arte H. Borla',
+        'Concejo Municipal',
+        'Intendencia'
+        ],
+
+    ("Primaria", "Exterior"): [
+        # Prestadores para Primaria de afuera de Esperanza
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Museo de Ciencias Naturales',
+        'Cuartel de Bomberos Voluntarios',
+        'Sala de Extracción de Miel',
+        'Fábrica de Dulce de Leche Bourquín',
+        'Country Pujol',
+        'Emax Cine',
+        'Museo de la Máquina Agrícola',
+        'Casa de la Colonia - Museo de Arte H. Borla'
+        # ...agregá los que correspondan
+    ],
+
+    ("Secundaria", "Interior"): [
+        # Prestadores para Secundaria de Esperanza
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Museo de Ciencias Naturales',
+        'Cuartel de Bomberos Voluntarios',
+        'Sala de Extracción de Miel',
+        'Fábrica de Dulce de Leche Bourquín',
+        'Country Pujol',
+        'Tanto Antón',
+        'Emax Cine',
+        'Biblioteca Municipal',
+        'Museo de la Máquina Agrícola',
+        'Casa de la Colonia - Museo de Arte H. Borla',
+        'Laboratorio Alecol',
+        'Concejo Municipal',
+        'Intendencia',
+        'Taller de Educación Vial (Ciudad de los Niños)'
+        # ...agregá los que correspondan
+    ],
+
+    ("Secundaria", "Exterior"): [
+        # Prestadores para Secundaria de afuera de Esperanza
+        'Museo de la Colonización',
+        'Casco Histórico',
+        'Museo de Ciencias Naturales',
+        'Cuartel de Bomberos Voluntarios',
+        'Sala de Extracción de Miel',
+        'Fábrica de Dulce de Leche Bourquín',
+        'Country Pujol',
+        'Emax Cine',
+        'Museo de la Máquina Agrícola',
+        'Casa de la Colonia - Museo de Arte H. Borla'
+        # ...agregá los que correspondan
+    ]
+}
 
 @bp.route('/')
 @bp.route('/solicitar-visita', methods=['GET', 'POST'])
@@ -40,7 +114,7 @@ def solicitar_visita():
                 fecha_solicitada=datetime.strptime(request.form['fecha_visita'], '%Y-%m-%d').date(),
                 
                 # Prestadores (NOMBRE CORRECTO)
-                prestadores_solicitados=','.join(request.form.getlist('lugares')),
+                prestadores_solicitados=json.dumps(request.form.getlist('lugares')),
                 
                 # Observaciones
                 observaciones=request.form.get('observaciones', ''),
