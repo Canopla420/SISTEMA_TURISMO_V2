@@ -1,29 +1,73 @@
 {% extends "base.html" %}
 {% block title %}Mis Visitas{% endblock %}
+
 {% block content %}
-<h2>Mis visitas asignadas</h2>
-<table class="table">
-    <thead>
-        <tr>
-            <th>Institución</th>
-            <th>Fecha</th>
-            <th>Hora inicio</th>
-            <th>Hora fin</th>
-            <th>Grupo</th>
-            <th>Observaciones</th>
-        </tr>
-    </thead>
-    <tbody>
-        {% for visita in visitas %}
-        <tr>
-            <td>{{ visita.solicitud.nombre_institucion }}</td>
-            <td>{{ visita.solicitud.fecha }}</td>
-            <td>{{ visita.hora_inicio }}</td>
-            <td>{{ visita.hora_fin }}</td>
-            <td>{{ visita.grupo }}</td>
-            <td>{{ visita.observaciones }}</td>
-        </tr>
-        {% endfor %}
-    </tbody>
-</table>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h2 class="mb-0">Mis visitas asignadas</h2>
+    <input id="filtro-visitas" class="form-control form-control-sm" style="min-width:260px; max-width:360px" placeholder="Filtrar por institución, localidad..." oninput="filtrarVisitas()">
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body p-0">
+      <div class="table-responsive">
+        <table id="tabla-visitas" class="table table-sm table-hover mb-0 align-middle">
+          <thead class="table-light">
+            <tr>
+              <th style="width:110px">Fecha</th>
+              <th style="width:140px">Horario</th>
+              <th>Institución</th>
+              <th>Localidad</th>
+              <th style="width:90px" class="text-center">Alumnos</th>
+              <th style="width:140px">Edad promedio</th>
+              <th style="width:240px">Observaciones</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for visita in visitas %}
+            <tr>
+              <td class="ps-3">
+                {{ visita.fecha_confirmada.strftime('%d/%m/%Y') 
+                   if visita.fecha_confirmada 
+                   else (visita.solicitud.fecha_solicitada.strftime('%d/%m/%Y') if visita.solicitud and visita.solicitud.fecha_solicitada else '-') }}
+              </td>
+
+              <td class="text-nowrap">
+                <span class="fw-bold">{{ visita.hora_inicio.strftime('%H:%M') if visita.hora_inicio else '-' }}</span>
+                <small class="text-muted"> — </small>
+                <span class="fw-bold">{{ visita.hora_fin.strftime('%H:%M') if visita.hora_fin else '-' }}</span>
+              </td>
+
+              <td>{{ visita.solicitud.nombre_institucion if visita.solicitud else ('ID ' ~ visita.solicitud_id) }}</td>
+              <td>{{ visita.solicitud.localidad if visita.solicitud and visita.solicitud.localidad else '-' }}</td>
+              <td class="text-center">{{ visita.solicitud.cantidad_alumnos if visita.solicitud and visita.solicitud.cantidad_alumnos is not none else '-' }}</td>
+              <td>{{ visita.solicitud.edad_promedio if visita.solicitud and visita.solicitud.edad_promedio else '-' }}</td>
+              <td class="text-truncate" style="max-width:240px;">{{ visita.observaciones_prestador or '-' }}</td>
+            </tr>
+            {% else %}
+            <tr>
+              <td colspan="7" class="text-center py-4 text-muted">No hay visitas asignadas.</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<style>
+  #tabla-visitas tbody tr:hover { background: rgba(0,0,0,0.03); }
+  @media (max-width: 768px) { #tabla-visitas td.text-truncate { max-width: 120px; } }
+</style>
+
+<script>
+function filtrarVisitas(){
+  const q = document.getElementById('filtro-visitas').value.toLowerCase().trim();
+  document.querySelectorAll('#tabla-visitas tbody tr').forEach(r=>{
+    if (!r.querySelector('td')) return;
+    r.style.display = q === '' ? '' : (r.innerText.toLowerCase().includes(q) ? '' : 'none');
+  });
+}
+</script>
 {% endblock %}

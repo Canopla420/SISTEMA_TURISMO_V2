@@ -1,108 +1,118 @@
 {% extends "base.html" %}
-
 {% block title %}Asignar Horarios - Admin{% endblock %}
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
     <h1>⏰ Asignar Horarios</h1>
-    <a href="/admin/solicitudes" class="btn btn-secondary">← Volver a Solicitudes</a>
+    <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-secondary">← Volver a Solicitudes</a>
 </div>
 
-<!-- Información de la Solicitud -->
+<!-- ...existing code... -->
 <div class="card mb-4">
-    <div class="card-header bg-primary text-white">
-        <h5 class="mb-0">📋 Solicitud #{{ solicitud.id }} - {{ solicitud.nombre_institucion }}</h5>
+  <div class="card-header bg-primary text-white">
+    <h5 class="mb-0">📋 Solicitud #{{ solicitud.id }} — {{ solicitud.nombre_institucion }}</h5>
+  </div>
+  <div class="card-body">
+    <div class="row">
+      <div class="col-md-6">
+        <p><strong>Localidad:</strong> {{ solicitud.localidad or '-' }}</p>
+        <p><strong>Fecha solicitud (envío):</strong> {{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') if solicitud.fecha_solicitud else '-' }}</p>
+        <p><strong>Fecha solicitada (visita):</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') if solicitud.fecha_solicitada else '-' }}</p>
+      </div>
+      <div class="col-md-6">
+        <p><strong>Responsable:</strong> {{ solicitud.responsable_nombre or '-' }}
+           {% if solicitud.responsable_cargo %} — {{ solicitud.responsable_cargo }}{% endif %}</p>
+        <p><strong>Email:</strong> {{ solicitud.responsable_email or '-' }} — <strong>Tel:</strong> {{ solicitud.responsable_telefono or '-' }}</p>
+        <p><strong>Nivel educativo:</strong> {{ solicitud.nivel_educativo or '-' }}</p>
+        <p><strong>Alumnos:</strong> {{ solicitud.cantidad_alumnos or 'No especificado' }}</p>
+        {% if solicitud.edad_promedio %}<p><strong>Edad promedio:</strong> {{ solicitud.edad_promedio }}</p>{% endif %}
+      </div>
+    </div>
+
+    <hr>
+
+    <div class="row">
+      <div class="col-12">
+        <p><strong>Horario preferido:</strong> {{ solicitud.horario_preferido or '-' }}</p>
+        <p><strong>Prestadores solicitados:</strong>
+          {% set lista = seleccionados if seleccionados is defined else solicitud.get_prestadores_seleccionados() %}
+          {% if lista %}
+            {% for p in lista %}<span class="badge bg-info me-1">{{ p }}</span>{% endfor %}
+          {% else %}
+            <span class="text-muted">No especificado</span>
+          {% endif %}
+        </p>
+        {% if solicitud.observaciones %}<p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+</div>
+<!-- ...existing code... -->
+
+<form id="asignar-horarios-form" method="POST" action="{{ url_for('admin.guardar_horarios', id=solicitud.id) }}">
+  {# Si usás Flask‑WTF, incluí {{ csrf_token() }} aquí #}
+  <input type="hidden" name="confirm_all" id="confirm_all" value="">
+
+<div class="card mb-4">
+    <div class="card-header bg-warning text-dark">
+    <h5 class="mb-0">Prestadores Solicitados - Coordinar Horarios</h5>
     </div>
     <div class="card-body">
-        <div class="row">
-            <div class="col-md-6">
-                <p><strong>Fecha solicitada:</strong> {{ fecha_visita }}</p>
-                <p><strong>Cantidad de alumnos:</strong> {{ solicitud.cantidad_alumnos }}</p>
-                <p><strong>Localidad:</strong> {{ solicitud.localidad }}</p>
-                <p><strong>Nivel:</strong> {{ solicitud.tipo_institucion }}</p>
+    {# iterar sobre todos los prestadores disponibles; marcar si están en 'seleccionados' #}
+    {% for prestador_obj in disponibles %}
+    {% set prestador = prestador_obj.razon_social %}
+    <div class="row mb-3 p-3 border rounded bg-light align-items-center">
+        <div class="col-md-4">
+        <label class="form-check-label h6">
+            <input type="checkbox" class="form-check-input me-2" name="prestadores[]" value="{{ prestador }}"
+                    {% if prestador in seleccionados %}checked{% endif %}>
+            {{ prestador }}
+        </label>
+        </div>
+
+        <div class="col-md-8">
+        <div class="row g-2">
+            <div class="col-md-3">
+            <label class="form-label">Hora inicio</label>
+            <input type="time" class="form-control form-control-sm" name="{{ prestador }}_inicio" id="inicio_{{ loop.index }}">
             </div>
-            <div class="col-md-6">
-                <p><strong>Contacto:</strong> {{ solicitud.contacto }}</p>
-                <p><strong>Teléfono:</strong> {{ solicitud.telefono }}</p>
-                <p><strong>Horario preferido:</strong> {{ solicitud.horario_preferido }}</p>
-                <p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>
+            <div class="col-md-3">
+            <label class="form-label">Hora fin</label>
+            <input type="time" class="form-control form-control-sm" name="{{ prestador }}_fin" id="fin_{{ loop.index }}">
+            </div>
+            <div class="col-md-2">
+            <label class="form-label">Grupo</label>
+            <select class="form-select form-select-sm" name="{{ prestador }}_grupo">
+                <option value="1">1</option>
+                <option value="2">2</option>
+            </select>
+            </div>
+            <div class="col-md-4">
+            <label class="form-label">Observaciones</label>
+            <input type="text" class="form-control form-control-sm" name="{{ prestador }}_obs" id="obs_{{ loop.index }}" placeholder="Obs.">
             </div>
         </div>
+        </div>
+    </div>
+    {% endfor %}
     </div>
 </div>
 
-<!-- Formulario de Asignación de Horarios -->
-<form id="asignar-horarios-form" method="POST" action="{{ url_for('admin.guardar_horarios', id=solicitud.id) }}">
-    <div class="card mb-4">
-        <div class="card-header bg-warning text-dark">
-            <h5 class="mb-0">Prestadores Solicitados - Coordinar Horarios</h5>
-        </div>
-        <div class="card-body">
-            {% for prestador in solicitud.get_prestadores_seleccionados() %}
-            <div class="row mb-4 p-3 border rounded bg-light">
-                <div class="col-md-4">
-                    <h6 class="text-primary">{{ prestador }}</h6>
-                </div>
-                <div class="col-md-8">
-                    <div class="row">
-                        <div class="col-md-3">
-                            <label class="form-label">Hora inicio:</label>
-                            <input type="time" class="form-control" name="{{ prestador }}_inicio">
-                        </div>
-                        <div class="col-md-3">
-                            <label class="form-label">Hora fin:</label>
-                            <input type="time" class="form-control" name="{{ prestador }}_fin">
-                        </div>
-                        <div class="col-md-2">
-                            <label class="form-label">Grupo:</label>
-                            <select class="form-select" name="{{ prestador }}_grupo">
-                                <option value="1">Grupo 1</option>
-                                <option value="2">Grupo 2</option>
-                            </select>
-                        </div>
-                        <div class="col-md-4">
-                            <label class="form-label">Observaciones:</label>
-                            <input type="text" class="form-control" name="{{ prestador }}_obs" placeholder="Observaciones">
-                        </div>
-                    </div>
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-    </div>
-
-    <!-- Resumen y Acciones -->
-    <div class="card mb-4">
-        <div class="card-header bg-success text-white">
-            <h5 class="mb-0">Resumen del Itinerario</h5>
-        </div>
-        <div class="card-body">
-            <div class="row">
-                <div class="col-md-8">
-                    <h6>Itinerario coordinado para {{ solicitud.fecha }}:</h6>
-                    <ul class="list-group list-group-flush">
-                        <!-- Podés mostrar el itinerario dinámicamente si tenés los horarios asignados -->
-                    </ul>
-                </div>
-                <div class="col-md-4">
-                    <h6>Información del grupo:</h6>
-                    <p><strong>Total:</strong> {{ solicitud.cantidad_alumnos }} alumnos + {{ solicitud.cantidad_docentes|default(0) }} docentes</p>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Botones de Acción -->
-    <div class="d-flex gap-3 justify-content-end">
-        <a href="/admin/solicitudes" class="btn btn-secondary">❌ Cancelar</a>
-        <button type="button" class="btn btn-warning" onclick="guardarBorrador()">💾 Guardar Borrador</button>
-        <button type="submit" class="btn btn-success btn-lg">✅ Confirmar y Crear Visitas</button>
-    </div>
+  <div class="d-flex gap-3 justify-content-end">
+    <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-secondary">❌ Cancelar</a>
+    <button type="button" class="btn btn-warning" onclick="guardarBorrador()">💾 Guardar Borrador</button>
+    <button type="button" class="btn btn-success btn-lg" onclick="confirmarYEnviar()">✅ Confirmar y Crear Visitas</button>
+  </div>
 </form>
 
 <script>
-function guardarBorrador() {
-    alert('Borrador guardado. Puede continuar coordinando más tarde.');
+function guardarBorrador(){
+  document.getElementById('confirm_all').value = '';
+  document.getElementById('asignar-horarios-form').submit();
+}
+function confirmarYEnviar(){
+  document.getElementById('confirm_all').value = '1';
+  document.getElementById('asignar-horarios-form').submit();
 }
 </script>
 {% endblock %}

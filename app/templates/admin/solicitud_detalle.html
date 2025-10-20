@@ -4,124 +4,130 @@
 
 {% block content %}
 <div class="d-flex justify-content-between align-items-center mb-4">
-    <h1>📋 Solicitud #{{ solicitud.id }}</h1>
-    <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-secondary">← Volver</a>
+  <h1>📋 Solicitud #{{ solicitud.id }}</h1>
+  <a href="{{ url_for('admin.solicitudes') }}" class="btn btn-secondary">← Volver</a>
 </div>
 
 <div class="row">
-    <div class="col-md-8">
-        <!-- Información de la Institución -->
-        <div class="card mb-4">
-            <div class="card-header bg-primary text-white">
-                <h5 class="mb-0">📍 Información de la Institución</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Nombre:</strong> {{ solicitud.nombre_institucion }}</p>
-                        <p><strong>Localidad:</strong> {{ solicitud.localidad }}</p>
-                        <p><strong>Responsable:</strong> {{ solicitud.responsable_nombre }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        <p><strong>Email:</strong> {{ solicitud.responsable_email }}</p>
-                        <p><strong>Teléfono:</strong> {{ solicitud.responsable_telefono }}</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Información del Grupo -->
-        <div class="card mb-4">
-            <div class="card-header bg-info text-white">
-                <h5 class="mb-0">👥 Información del Grupo</h5>
-            </div>
-            <div class="card-body">
-                <div class="row">
-                    <div class="col-md-6">
-                        <p><strong>Nivel Educativo:</strong> {{ solicitud.nivel_educativo }}</p>
-                        <p><strong>Cantidad de Alumnos:</strong> {{ solicitud.cantidad_alumnos }}</p>
-                    </div>
-                    <div class="col-md-6">
-                        {% if solicitud.edad_promedio %}
-                        <p><strong>Edad Promedio:</strong> {{ solicitud.edad_promedio }}</p>
-                        {% endif %}
-                        {% if solicitud.necesidades_especiales %}
-                        <p><strong>Necesidades Especiales:</strong> {{ solicitud.necesidades_especiales }}</p>
-                        {% endif %}
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Información de la Visita -->
-        <div class="card mb-4">
-            <div class="card-header bg-warning text-dark">
-                <h5 class="mb-0">📅 Información de la Visita</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>Fecha Solicitada:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') }}</p>
-                <p><strong>Lugares Solicitados:</strong></p>
-                <div class="mb-2">
-                    {% for lugar in lugares %}
-                    <span class="badge bg-info me-1">{{ lugar }}</span>
-                    {% endfor %}
-                </div>
-                {% if solicitud.observaciones %}
-                <p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>
-                {% endif %}
-            </div>
-        </div>
+  <div class="col-md-8">
+    <div class="card mb-3">
+      <div class="card-header bg-primary text-white"><strong>📍 Información de la Institución</strong></div>
+      <div class="card-body">
+        <p><strong>Nombre:</strong> {{ solicitud.nombre_institucion or '-' }}</p>
+        <p><strong>Nivel educativo:</strong> {{ solicitud.nivel_educativo or '-' }}</p>
+        <p><strong>Localidad:</strong> {{ solicitud.localidad or '-' }}</p>
+        <p><strong>Responsable:</strong>
+           {{ solicitud.responsable_nombre or '-' }}
+           {% if solicitud.responsable_cargo %} — {{ solicitud.responsable_cargo }}{% endif %}
+        </p>
+        <p><strong>Email:</strong> {{ solicitud.responsable_email or '-' }} — <strong>Tel:</strong> {{ solicitud.responsable_telefono or '-' }}</p>
+      </div>
     </div>
 
-    <div class="col-md-4">
-        <!-- Estado -->
-        <div class="card mb-4">
-            <div class="card-header bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %} text-{% if solicitud.estado == 'PENDIENTE' %}dark{% else %}white{% endif %}">
-                <h5 class="mb-0">📊 Estado</h5>
-            </div>
-            <div class="card-body">
-                <p><strong>Estado:</strong> 
-                    <span class="badge bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %}">
-                        {{ solicitud.estado }}
-                    </span>
-                </p>
-                <p><strong>Fecha Solicitud:</strong> {{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}</p>
-                {% if solicitud.fecha_respuesta %}
-                <p><strong>Fecha Respuesta:</strong> {{ solicitud.fecha_respuesta.strftime('%d/%m/%Y %H:%M') }}</p>
-                {% endif %}
-                {% if solicitud.motivo_rechazo %}
-                <p><strong>Motivo Rechazo:</strong> {{ solicitud.motivo_rechazo }}</p>
-                {% endif %}
-            </div>
-        </div>
+    <div class="card mb-3">
+      <div class="card-header bg-info text-white"><strong>👥 Información del Grupo</strong></div>
+      <div class="card-body">
+        <p><strong>Cantidad alumnos:</strong> {{ solicitud.cantidad_alumnos if solicitud.cantidad_alumnos is not none else 'No especificado' }}</p>
+        <p><strong>Cantidad docentes:</strong>
+           {% if solicitud.cantidad_docentes is none or solicitud.cantidad_docentes == 0 %}
+             No especificado
+           {% else %}
+             {{ solicitud.cantidad_docentes }}
+           {% endif %}
+        </p>
+        {% if solicitud.edad_promedio %}<p><strong>Edad promedio:</strong> {{ solicitud.edad_promedio }}</p>{% endif %}
+        {% if solicitud.necesidades_especiales %}<p><strong>Necesidades especiales:</strong> {{ solicitud.necesidades_especiales }}</p>{% endif %}
+      </div>
+    </div>
 
-        <!-- Acciones -->
+    <div class="card mb-3">
+      <div class="card-header bg-warning text-dark"><strong>📅 Información de la Visita</strong></div>
+      <div class="card-body">
+        <p><strong>Fecha solicitada:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') if solicitud.fecha_solicitada else '-' }}</p>
+        <p><strong>Horario preferido:</strong> {{ solicitud.horario_preferido or '-' }}</p>
+        <p><strong>Lugares / Prestadores solicitados:</strong></p>
+        <div class="mb-2">
+          {% for p in seleccionados %}
+            <span class="badge bg-info me-1">{{ p }}</span>
+          {% else %}
+            <span class="text-muted">No especificado</span>
+          {% endfor %}
+        </div>
+        {% if solicitud.observaciones %}<p><strong>Observaciones:</strong> {{ solicitud.observaciones }}</p>{% endif %}
+      </div>
+    </div>
+  </div>
+
+  <div class="col-md-4">
+    <div class="card mb-3">
+      <div class="card-header bg-warning text-dark"><strong>📊 Estado</strong></div>
+      <div class="card-body">
+        <p><strong>Estado:</strong> <span class="badge bg-{{ solicitud.get_estado_color() }}">{{ solicitud.estado }}</span></p>
+        <p><strong>Fecha solicitud:</strong> {{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') if solicitud.fecha_solicitud else '-' }}</p>
+        {% if solicitud.fecha_respuesta %}<p><strong>Fecha respuesta:</strong> {{ solicitud.fecha_respuesta.strftime('%d/%m/%Y %H:%M') }}</p>{% endif %}
+        {% if solicitud.motivo_rechazo %}<p><strong>Motivo rechazo:</strong> {{ solicitud.motivo_rechazo }}</p>{% endif %}
+      </div>
+    </div>
+
+    <div class="card mb-3">
+      <div class="card-header bg-light"><strong>⚡ Acciones</strong></div>
+      <div class="card-body">
         {% if solicitud.estado == 'PENDIENTE' %}
-        <div class="card">
-            <div class="card-header bg-light">
-                <h5 class="mb-0">⚡ Acciones</h5>
-            </div>
-            <div class="card-body">
-                <form method="POST" action="{{ url_for('admin.aprobar_solicitud', id=solicitud.id) }}" class="mb-2">
-                    <button type="submit" class="btn btn-success w-100" onclick="return confirm('¿Aprobar esta solicitud?')">
-                        ✅ Aprobar
-                    </button>
-                </form>
-                
-                <form method="POST" action="{{ url_for('admin.rechazar_solicitud', id=solicitud.id) }}">
-                    <input type="text" name="motivo" class="form-control mb-2" placeholder="Motivo del rechazo" required>
-                    <button type="submit" class="btn btn-danger w-100" onclick="return confirm('¿Rechazar esta solicitud?')">
-                        ❌ Rechazar
-                    </button>
-                </form>
-                
-                <hr>
-                <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" class="btn btn-warning w-100">
-                    ⏰ Asignar Horarios
-                </a>
-            </div>
-        </div>
+          <form method="POST" action="{{ url_for('admin.aprobar_solicitud', id=solicitud.id) }}" class="mb-2">
+            <button class="btn btn-success w-100">✅ Aprobar</button>
+          </form>
+          <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" class="btn btn-warning w-100 mb-2">⏰ Asignar Horarios</a>
+        {% else %}
+          <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" class="btn btn-outline-secondary w-100 mb-2">⏰ Ver / Asignar Horarios</a>
         {% endif %}
+        <form method="POST" action="{{ url_for('admin.eliminar_solicitud', id=solicitud.id) }}" onsubmit="return confirm('Eliminar solicitud y sus visitas asociadas?');">
+          <button class="btn btn-danger w-100">🗑️ Eliminar Solicitud</button>
+        </form>
+      </div>
     </div>
+
+<div class="card">
+  <div class="card-header"><strong>Visitas creadas</strong></div>
+  <div class="card-body">
+    {% if visitas %}
+      {% for v in visitas %}
+        <div class="d-flex justify-content-between align-items-start mb-2">
+          <div class="flex-grow-1">
+            <form method="POST" action="{{ url_for('admin.editar_visita', id=v.id) }}" class="row g-2 align-items-center">
+              {# Si usás CSRF: incluí {{ csrf_token() }} dentro del form #}
+              <div class="col-12 col-sm-4">
+                <strong>{{ v.prestador.razon_social if v.prestador else ('ID ' ~ v.prestador_id) }}</strong><br>
+                <small class="text-muted">{{ v.fecha_confirmada.strftime('%d/%m/%Y') if v.fecha_confirmada else '' }}</small>
+              </div>
+
+              <div class="col-auto">
+                <input type="time" name="hora_inicio" class="form-control form-control-sm" value="{{ v.hora_inicio.strftime('%H:%M') if v.hora_inicio else '' }}">
+              </div>
+              <div class="col-auto">
+                <input type="time" name="hora_fin" class="form-control form-control-sm" value="{{ v.hora_fin.strftime('%H:%M') if v.hora_fin else '' }}">
+              </div>
+              <div class="col-auto" style="min-width:200px;">
+                <input type="text" name="obs" class="form-control form-control-sm" placeholder="Observaciones" value="{{ v.observaciones_prestador or '' }}">
+              </div>
+
+              <div class="col-auto">
+                <button class="btn btn-sm btn-primary" type="submit">Guardar</button>
+              </div>
+            </form>
+          </div>
+
+          <div class="ms-2">
+            <form method="POST" action="{{ url_for('admin.eliminar_visita', id=v.id) }}" onsubmit="return confirm('Eliminar esta visita?');">
+              {# CSRF si corresponde #}
+              <button class="btn btn-sm btn-outline-danger">Eliminar</button>
+            </form>
+          </div>
+        </div>
+        <hr>
+      {% endfor %}
+    {% else %}
+      <div class="alert alert-info">No hay visitas asignadas para esta solicitud.</div>
+    {% endif %}
+  </div>
 </div>
 {% endblock %}

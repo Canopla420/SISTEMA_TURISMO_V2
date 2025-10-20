@@ -29,7 +29,7 @@
     <div class="col-md-3">
         <div class="card bg-success text-white">
             <div class="card-body text-center">
-                <h3>{{ solicitudes|selectattr('estado', 'equalto', 'APROBADA')|list|length }}</h3>
+                <h3>{{ solicitudes|selectattr('estado', 'equalto', 'CONFIRMADA')|list|length }}</h3>
                 <p class="mb-0">Aprobadas</p>
             </div>
         </div>
@@ -47,71 +47,56 @@
 <!-- Lista de Solicitudes CON BOTÓN ELIMINAR -->
 <div class="row">
     {% for solicitud in solicitudes %}
-    <div class="col-md-6 mb-4">
-        <div class="card border-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %}">
-            <div class="card-header bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %} text-{% if solicitud.estado == 'PENDIENTE' %}dark{% else %}white{% endif %} d-flex justify-content-between align-items-center">
-                <div>
-                    <h5 class="mb-0">📋 Solicitud #{{ solicitud.id }}</h5>
-                    <small>{{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}</small>
-                </div>
-                <!-- BOTÓN ELIMINAR EN EL HEADER -->
-                <form method="POST" action="{{ url_for('admin.eliminar_solicitud', id=solicitud.id) }}" style="display: inline;">
-                    <button type="submit" class="btn btn-sm btn-outline-danger" 
-                            onclick="return confirm('⚠️ ¿ELIMINAR permanentemente la solicitud #{{ solicitud.id }}? Esta acción NO se puede deshacer.')"
-                            title="Eliminar solicitud">
-                        🗑️
-                    </button>
-                </form>
+      {% set est = (solicitud.estado or 'PENDIENTE')|upper %}
+      <div class="col-md-6 mb-4">
+        <div class="card border-{% if est == 'PENDIENTE' %}warning{% elif est == 'CONFIRMADA' %}success{% else %}danger{% endif %}">
+          <div class="card-header bg-{% if est == 'PENDIENTE' %}warning{% elif est == 'CONFIRMADA' %}success{% else %}danger{% endif %} text-{% if est == 'PENDIENTE' %}dark{% else %}white{% endif %} d-flex justify-content-between align-items-center">
+            <div>
+              <strong>Solicitud #{{ solicitud.id }}</strong><br>
+              <small class="text-muted">{{ solicitud.fecha_solicitud.strftime('%d/%m/%Y %H:%M') }}</small>
             </div>
-            <div class="card-body">
-                <h6 class="card-title">🏫 {{ solicitud.nombre_institucion }}</h6>
-                <p class="card-text">
-                    <strong>📅 Fecha:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') }}<br>
-                    <strong>👥 Alumnos:</strong> {{ solicitud.cantidad_alumnos }}<br>
-                    <strong>📍 Localidad:</strong> {{ solicitud.localidad }}<br>
-                    <strong>📞 Contacto:</strong> {{ solicitud.responsable_nombre }} - {{ solicitud.responsable_telefono }}<br>
-                    <strong>🎯 Nivel:</strong> {{ solicitud.nivel_educativo }}
-                    {% if solicitud.edad_promedio %}
-                    ({{ solicitud.edad_promedio }})
-                    {% endif %}
-                </p>
-                <div class="mb-2">
-                <strong>Prestadores solicitados:</strong>
-                    <div>
-                    {% for lugar in solicitud.lugares %}
-                        <span class="badge bg-info me-1">{{ lugar }}</span>
-                    {% endfor %}
-                    </div>
-                </div>
-                <div class="mb-3">
-                    <span class="badge bg-{% if solicitud.estado == 'PENDIENTE' %}warning{% elif solicitud.estado == 'APROBADA' %}success{% else %}danger{% endif %}">
-                        {{ solicitud.estado }}
-                    </span>
-                </div>
-                
-                <!-- BOTONES DE ACCIÓN -->
-                <div class="d-grid gap-2">
-                    <div class="row">
-                        <div class="col-6">
-                            <a href="{{ url_for('admin.ver_solicitud', id=solicitud.id) }}" 
-                               class="btn btn-outline-primary btn-sm w-100">📋 Ver Detalles</a>
-                        </div>
-                        <div class="col-6">
-                            {% if solicitud.estado == 'PENDIENTE' %}
-                            <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" 
-                               class="btn btn-warning btn-sm w-100">⏰ Horarios</a>
-                            {% elif solicitud.estado == 'APROBADA' %}
-                            <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" 
-                               class="btn btn-success btn-sm w-100">✅ Gestionar</a>
-                            {% else %}
-                            <span class="btn btn-outline-secondary btn-sm w-100 disabled">❌ Rechazada</span>
-                            {% endif %}
-                        </div>
-                    </div>
-                </div>
+            <div>
+              <span class="badge {% if est=='CONFIRMADA' %}bg-success{% elif est=='RECHAZADA' %}bg-danger{% else %}bg-warning{% endif %}">{{ est }}</span>
             </div>
+          </div>
+
+          <div class="card-body">
+            <h6 class="card-title">🏫 {{ solicitud.nombre_institucion }}</h6>
+            <p>
+              <strong>📅 Fecha:</strong> {{ solicitud.fecha_solicitada.strftime('%d/%m/%Y') }}<br>
+              <strong>👥 Alumnos:</strong> {{ solicitud.cantidad_alumnos }}<br>
+            </p>
+
+            <p><strong>Prestadores solicitados:</strong>
+              {% for lugar in solicitud.lugares %}<span class="badge bg-info me-1">{{ lugar }}</span>{% endfor %}
+            </p>
+
+            <div class="mt-3">
+              <div class="row g-2">
+                <div class="col-12 col-sm-4">
+                  <a href="{{ url_for('admin.ver_solicitud', id=solicitud.id) }}" class="btn btn-outline-primary btn-sm w-100">📋 Ver Detalles</a>
+                </div>
+
+                <div class="col-12 col-sm-4">
+                  {% if est == 'PENDIENTE' %}
+                    <a href="{{ url_for('admin.asignar_horarios', id=solicitud.id) }}" class="btn btn-warning btn-sm w-100">⏰ Horarios</a>
+                  {% else %}
+                    <a href="{{ url_for('admin.ver_solicitud', id=solicitud.id) }}" class="btn btn-success btn-sm w-100">✅ Gestionar/Ver</a>
+                  {% endif %}
+                </div>
+
+                <div class="col-12 col-sm-4">
+                  <form method="POST" action="{{ url_for('admin.eliminar_solicitud', id=solicitud.id) }}" style="display:inline;">
+                    {# Si usás Flask‑WTF, incluí {{ csrf_token() }} aquí #}
+                    <button class="btn btn-sm btn-outline-danger w-100" onclick="return confirm('Eliminar solicitud #{{ solicitud.id }}? Esta acción eliminará también las visitas asociadas.');">Eliminar</button>
+                  </form>
+                </div>
+              </div>
+            </div>
+
+          </div>
         </div>
-    </div>
+      </div>
     {% endfor %}
 </div>
 

@@ -1,15 +1,56 @@
-<h2>{{ accion }} Prestador</h2>
-<form method="POST" action="{{ url_for('admin.crear_prestador') }}">
-    <label>Razón social:</label>
-    <input type="text" name="razon_social" required><br>
-    <label>Contacto responsable:</label>
-    <input type="text" name="contacto_responsable" required><br>
-    <label>Teléfono:</label>
-    <input type="text" name="telefono" required><br>
-    <label>Email:</label>
-    <input type="email" name="email" required><br>
-    <label>Contraseña:</label>
-    <input type="password" name="password" required><br>
-    <!-- Agregá otros campos si querés -->
-    <button type="submit">Crear</button>
-</form>
+{% extends "base.html" %}
+{% block title %}{{ 'Editar Prestador' if prestador else 'Crear Prestador' }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>{{ 'Editar Prestador' if prestador else 'Crear Prestador' }}</h1>
+    <a href="{{ url_for('admin.prestadores') }}" class="btn btn-secondary">← Volver</a>
+  </div>
+
+  <div class="card shadow-sm">
+    <div class="card-body">
+      <form method="post" action="{{ action_url }}">
+        {# Si usás csrf: <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"> #}
+
+        <div class="row">
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Razón social</label>
+            <input name="razon_social" class="form-control" value="{{ prestador.razon_social if prestador else '' }}">
+          </div>
+
+          <div class="col-md-6 mb-3">
+            <label class="form-label">Contacto responsable</label>
+            <input name="contacto_responsable" class="form-control" value="{{ prestador.contacto_responsable if prestador else '' }}">
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Teléfono</label>
+            <input name="telefono" class="form-control" value="{{ prestador.telefono if prestador else '' }}">
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Email</label>
+            <input name="email" class="form-control" value="{{ prestador.email if prestador else '' }}">
+          </div>
+
+          <div class="col-md-4 mb-3">
+            <label class="form-label">Contraseña (solo si querés cambiar)</label>
+            <input type="password" name="password" class="form-control" value="">
+          </div>
+
+          <div class="col-12 mb-3">
+            <label class="form-label">Observaciones / Dirección</label>
+            <input name="direccion" class="form-control" value="{{ prestador.direccion if prestador else '' }}">
+          </div>
+
+          <div class="col-12 d-flex gap-2 justify-content-end">
+            <a href="{{ url_for('admin.prestadores') }}" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-primary">{{ 'Guardar cambios' if prestador else 'Crear' }}</button>
+          </div>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+{% endblock %}

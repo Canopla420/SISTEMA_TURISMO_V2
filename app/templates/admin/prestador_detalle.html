@@ -1,11 +1,48 @@
-<h2>Detalle del Prestador</h2>
-<ul>
-    <li><strong>Razón social:</strong> {{ prestador.razon_social }}</li>
-    <li><strong>Contacto responsable:</strong> {{ prestador.contacto_responsable }}</li>
-    <li><strong>Teléfono:</strong> {{ prestador.telefono }}</li>
-    <li><strong>Email:</strong> {{ prestador.email }}</li>
-    <li><strong>Contraseña:</strong> {{ prestador.password_hash }}</li>
-    <li><strong>Contraseña:</strong>    </li>
-    <!-- Agregá otros campos si querés -->
-</ul>
-<a href="{{ url_for('admin.prestadores') }}">Volver a la lista</a>
+{% extends "base.html" %}
+{% block title %}Detalle del Prestador{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1>Detalle del Prestador</h1>
+    <div>
+      <a href="{{ url_for('admin.prestadores') }}" class="btn btn-secondary">Volver</a>
+      <a href="{{ url_for('admin.editar_prestador', id=prestador.id) }}" class="btn btn-warning ms-2">Editar</a>
+      <form method="POST" action="{{ url_for('admin.eliminar_prestador', id=prestador.id) }}" class="d-inline" onsubmit="return confirm('Eliminar prestador?');">
+        {# csrf token si corresponde #}
+        <button class="btn btn-danger ms-2">Eliminar</button>
+      </form>
+    </div>
+  </div>
+
+  <div class="row">
+    <div class="col-md-8">
+      <div class="card mb-3 shadow-sm">
+        <div class="card-body">
+          <h5 class="card-title">{{ prestador.razon_social }}</h5>
+          <ul class="list-unstyled mb-0">
+            <li><strong>Contacto responsable:</strong> {{ prestador.contacto_responsable or '-' }}</li>
+            <li><strong>Teléfono:</strong> {{ prestador.telefono or '-' }}</li>
+            <li><strong>Email:</strong> {{ prestador.email or '-' }}</li>
+            <li><strong>Dirección:</strong> {{ prestador.direccion or '-' }}</li>
+            <li><strong>Activo:</strong> {{ 'Sí' if prestador.activo else 'No' }}</li>
+            {% if prestador.observaciones %}
+            <li><strong>Observaciones:</strong> {{ prestador.observaciones }}</li>
+            {% endif %}
+          </ul>
+        </div>
+      </div>
+    </div>
+
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h6 class="card-subtitle mb-2 text-muted">Metadatos</h6>
+          <p class="mb-1"><strong>ID:</strong> {{ prestador.id }}</p>
+          <p class="mb-1"><strong>Creado:</strong> {{ prestador.created_at.strftime('%d/%m/%Y') if prestador.created_at else '-' }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+{% endblock %}
