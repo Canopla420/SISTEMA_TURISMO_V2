@@ -12,7 +12,7 @@
     <!-- Navbar con LINKS FUNCIONALES -->
     <nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <div class="container">
-            <a class="navbar-brand" href="{{ url_for('admin.dashboard') }}">
+            <a class="navbar-brand" href="{{ url_for('main.index') }}">
                 🏛️ Turismo Esperanza
             </a>
             
@@ -22,10 +22,25 @@
             
             <div class="collapse navbar-collapse" id="navbarNav">
                 <div class="navbar-nav ms-auto">
+                    <!-- enlace público siempre visible -->
                     <a class="nav-link" href="{{ url_for('publico.solicitar_visita') }}">📝 Solicitar Visita</a>
-                    <a class="nav-link" href="{{ url_for('admin.dashboard') }}">📊 Admin</a>
-                    <a class="nav-link" href="{{ url_for('admin.solicitudes') }}">📋 Solicitudes</a>
-                    <a class="nav-link" href="{{ url_for('admin.prestadores') }}">🏛️ Prestadores</a>
+
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.role == 'admin' %}
+                            <a class="nav-link" href="{{ url_for('admin.dashboard') }}">📊 Admin</a>
+                            <a class="nav-link" href="{{ url_for('admin.solicitudes') }}">📋 Solicitudes</a>
+                            <a class="nav-link" href="{{ url_for('admin.prestadores') }}">🏛️ Prestadores</a>
+                        {% elif current_user.role == 'prestador' %}
+                            <a class="nav-link" href="{{ url_for('prestador.mis_visitas') }}">🏛️ Mis Visitas</a>
+                        {% endif %}
+
+                        {# Ajustá el endpoint de logout si en tu app se llama distinto #}
+                        <a class="nav-link" href="{{ url_for('admin.logout') }}">Salir</a>
+                    {% else %}
+                        <!-- links de acceso cuando no hay sesión -->
+                        <a class="nav-link" href="{{ url_for('admin.login') }}">Admin</a>
+                        <a class="nav-link" href="{{ url_for('prestador.login') }}">Prestador</a>
+                    {% endif %}
                 </div>
             </div>
         </div>

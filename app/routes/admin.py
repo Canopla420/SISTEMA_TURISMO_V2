@@ -1,17 +1,49 @@
+
 from flask import Blueprint, render_template, request, redirect, url_for, flash
-from flask_login import current_user
+from flask_login import current_user, login_required, login_user, logout_user
 from app.models.solicitud_visita import SolicitudVisita
 from app import db
 from app.models.prestador import Prestador
 from app.models.visita_prestador import VisitaPrestador
 from datetime import datetime
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 import json
-
+from app.decorators import admin_required
 
 bp = Blueprint('admin', __name__)
 
+@bp.route('/login', methods=['GET', 'POST'])
+def login():
+    """Página de login para administradores (email + password)."""
+    if request.method == 'POST':
+        email = (request.form.get('email') or '').strip()
+        password = request.form.get('password') or ''
+
+        if not email or not password:
+            flash('Email y contraseña son requeridos.', 'danger')
+            return redirect(url_for('admin.login'))
+
+        admin = Prestador.query.filter_by(email=email, role='admin').first()
+        if admin and admin.password_hash and check_password_hash(admin.password_hash, password):
+            login_user(admin)
+            flash('Bienvenido, administrador.', 'success')
+            return redirect(url_for('admin.dashboard'))
+        else:
+            flash('Credenciales inválidas.', 'danger')
+            return redirect(url_for('admin.login'))
+
+    return render_template('admin/login.html')
+
+@bp.route('/logout')
+@login_required
+def logout():
+    logout_user()
+    flash('Sesión cerrada.', 'success')
+    return redirect(url_for('main.index'))
+
 @bp.route('/')
+@login_required
+@admin_required
 def dashboard():
     """Dashboard principal del administrador"""
     # Estadísticas básicas
@@ -27,15 +59,9 @@ def dashboard():
                          rechazadas=rechazadas)
 
 
-
-@bp.route('/login')
-def login():
-    """Página de login para administradores"""
-    return "<h1>Login Admin</h1><p>Formulario de login para administradores</p>"
-
-
-
 @bp.route('/solicitudes')
+@login_required
+@admin_required
 def solicitudes():
     """Lista todas las solicitudes de visitas"""
     solicitudes = SolicitudVisita.query.order_by(SolicitudVisita.fecha_solicitud.desc()).all()
@@ -43,12 +69,11 @@ def solicitudes():
         solicitud.lugares = json.loads(solicitud.prestadores_solicitados) if solicitud.prestadores_solicitados else []
     return render_template('admin/solicitudes.html', solicitudes=solicitudes)
 
-
-
 @bp.route('/solicitud/<int:id>')
+@login_required
+@admin_required
 def ver_solicitud(id):
     solicitud = SolicitudVisita.query.get_or_404(id)
-    # obtener lista de prestadores (intenta método del modelo o parsear JSON)
     try:
         seleccionados = solicitud.get_prestadores_seleccionados()
     except Exception:
@@ -59,8 +84,9 @@ def ver_solicitud(id):
                            seleccionados=seleccionados,
                            visitas=visitas)
 
-
 @bp.route('/solicitud/<int:id>/aprobar', methods=['POST'])
+@login_required
+@admin_required
 def aprobar_solicitud(id):
     """Marcar solicitud como CONFIRMADA (no crear visitas)"""
     try:
@@ -75,8 +101,9 @@ def aprobar_solicitud(id):
         flash(f'❌ Error al aprobar solicitud: {e}', 'danger')
     return redirect(url_for('admin.ver_solicitud', id=id))
 
-
 @bp.route('/solicitud/<int:id>/rechazar', methods=['POST'])
+@login_required
+@admin_required
 def rechazar_solicitud(id):
     """Rechazar una solicitud"""
     try:
@@ -98,19 +125,15 @@ def rechazar_solicitud(id):
     
     return redirect(url_for('admin.ver_solicitud', id=id))
 
-
-
 @bp.route('/solicitudes/<int:id>/horarios')
+@login_required
+@admin_required
 def asignar_horarios(id):
     solicitud = SolicitudVisita.query.get_or_404(id)
-
-    # lista de prestadores seleccionados guardada en la solicitud (JSON)
     try:
         seleccionados = solicitud.get_prestadores_seleccionados()
     except Exception:
         seleccionados = json.loads(solicitud.prestadores_solicitados or '[]')
-
-    # obtener prestadores "disponibles" — intentamos filtrar por tipo de institución si existe el campo
     query = Prestador.query.filter_by(activo=True)
     if getattr(solicitud, 'tipo_institucion', None) and hasattr(Prestador, 'tipo_institucion'):
         query = query.filter_by(tipo_institucion=solicitud.tipo_institucion)
@@ -121,16 +144,14 @@ def asignar_horarios(id):
                            seleccionados=seleccionados,
                            disponibles=disponibles)
 
-
 @bp.route('/solicitudes/<int:id>/horarios', methods=['POST'])
+@login_required
+@admin_required
 def guardar_horarios(id):
     solicitud = SolicitudVisita.query.get_or_404(id)
-
     seleccionados = request.form.getlist('prestadores[]')
-
     horarios_prestadores = []
     faltantes_confirm = []
-
     confirm_all = bool(request.form.get('confirm_all'))
     for nombre in seleccionados:
         inicio = request.form.get(f'{nombre}_inicio')
@@ -179,34 +200,26 @@ def guardar_horarios(id):
 
     return redirect(url_for('admin.ver_solicitud', id=id))
 
-
-
 @bp.route('/solicitud/<int:id>/eliminar', methods=['POST'])
+@login_required
+@admin_required
 def eliminar_solicitud(id):
-    """Eliminar una solicitud y sus visitas asociadas (asegurarse permisos/CSRF desde plantilla)"""
-    # opcional: control de permisos (ej. current_user.is_admin)
-    # if not getattr(current_user, 'is_admin', False):
-    #     flash('No autorizado', 'danger')
-    #     return redirect(url_for('admin.ver_solicitud', id=id))
-
     solicitud = SolicitudVisita.query.get_or_404(id)
     nombre_institucion = solicitud.nombre_institucion
     try:
-        # borrado en bloque de las visitas asociadas (más eficiente)
         VisitaPrestador.query.filter_by(solicitud_id=id).delete(synchronize_session=False)
         db.session.delete(solicitud)
         db.session.commit()
         flash(f'🗑️ Solicitud #{id} de \"{nombre_institucion}\" eliminada correctamente', 'success')
     except Exception as e:
         db.session.rollback()
-        # loguear el error si querés: app.logger.exception(e)
         flash(f'❌ Error al eliminar solicitud: {e}', 'danger')
     return redirect(url_for('admin.solicitudes'))
 
-
 @bp.route('/visita/<int:id>/eliminar', methods=['POST'])
+@login_required
+@admin_required
 def eliminar_visita(id):
-    """Eliminar una VisitaPrestador y volver al detalle de la solicitud"""
     visita = VisitaPrestador.query.get_or_404(id)
     try:
         solicitud_id = visita.solicitud_id
@@ -219,8 +232,9 @@ def eliminar_visita(id):
         print('Error eliminar_visita:', e)
     return redirect(request.referrer or url_for('admin.ver_solicitud', id=solicitud_id))
 
-
 @bp.route('/visita/<int:id>/editar', methods=['POST'])
+@login_required
+@admin_required
 def editar_visita(id):
     visita = VisitaPrestador.query.get_or_404(id)
     hora_inicio = request.form.get('hora_inicio')
@@ -245,22 +259,24 @@ def editar_visita(id):
 
     return redirect(url_for('admin.ver_solicitud', id=visita.solicitud_id))
 
-
 @bp.route('/prestadores')
+@login_required
+@admin_required
 def prestadores():
     """Lista todos los prestadores de servicios turísticos"""
     prestadores = Prestador.query.filter_by(activo=True).order_by(Prestador.razon_social).all()
     return render_template('admin/prestadores.html', prestadores=prestadores)
 
-
-
 @bp.route('/prestadores/nuevo')
+@login_required
+@admin_required
 def nuevo_prestador():
     """Formulario para crear un nuevo prestador"""
     return render_template('admin/prestador_form.html', prestador=None, accion='Crear')
 
-
 @bp.route('/solicitudes/<int:id>/prestador/asignar', methods=['POST'])
+@login_required
+@admin_required
 def asignar_prestador(id):
     solicitud = SolicitudVisita.query.get_or_404(id)
     prestador_nombre = request.form.get('prestador_nombre')
@@ -303,8 +319,9 @@ def asignar_prestador(id):
 
     return redirect(url_for('admin.asignar_horarios', id=id))
 
-
 @bp.route('/prestadores/crear', methods=['POST'])
+@login_required
+@admin_required
 def crear_prestador():
     """Crear un nuevo prestador"""
     try:
@@ -341,17 +358,17 @@ def crear_prestador():
         db.session.rollback()
         return redirect(url_for('admin.nuevo_prestador'))
 
-
-
 @bp.route('/prestadores/<int:id>')
+@login_required
+@admin_required
 def ver_prestador(id):
     """Ver detalles de un prestador"""
     prestador = Prestador.query.get_or_404(id)
     return render_template('admin/prestador_detalle.html', prestador=prestador)
 
-
-
 @bp.route('/prestadores/<int:id>/editar', methods=['GET','POST'])
+@login_required
+@admin_required
 def editar_prestador(id):
     from app.models.prestador import Prestador
     prestador = Prestador.query.get_or_404(id)
@@ -367,11 +384,10 @@ def editar_prestador(id):
         return redirect(url_for('admin.prestadores'))
     return render_template('admin/prestador_form.html', prestador=prestador, action_url=url_for('admin.editar_prestador', id=prestador.id))
 
-
-
 @bp.route('/prestadores/<int:id>/actualizar', methods=['POST'])
+@login_required
+@admin_required
 def actualizar_prestador(id):
-    """Actualizar un prestador existente"""
     try:
         prestador = Prestador.query.get_or_404(id)
         
@@ -403,11 +419,10 @@ def actualizar_prestador(id):
         db.session.rollback()
         return redirect(url_for('admin.editar_prestador', id=id))
 
-
-
 @bp.route('/prestadores/<int:id>/eliminar', methods=['POST'])
+@login_required
+@admin_required
 def eliminar_prestador(id):
-    """Eliminar (desactivar) un prestador"""
     try:
         prestador = Prestador.query.get_or_404(id)
         prestador.activo = False
@@ -421,16 +436,16 @@ def eliminar_prestador(id):
     
     return redirect(url_for('admin.prestadores'))
 
-
-
 @bp.route('/reportes')
+@login_required
+@admin_required
 def reportes():
     """Reportes y estadísticas"""
-    return "<h1>📊 Reportes</h1><p>Estadísticas y reportes del sistema</p>"
-
-
+    return render_template('admin/reportes.html')
 
 @bp.route('/configuracion')
+@login_required
+@admin_required
 def configuracion():
     """Configuración del sistema"""
-    return "<h1>⚙️ Configuración</h1><p>Configuración del sistema de turismo</p>"
+    return render_template('admin/configuracion.html')

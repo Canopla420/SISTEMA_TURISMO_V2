@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}Inicio{% endblock %}
+
+{% block content %}
+<div class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-md-10">
+      <h1 class="mb-4">Bienvenido — Seleccioná tu sección</h1>
+
+      <div class="row g-3">
+        <div class="col-md-4">
+          <a href="{{ url_for('admin.login') }}" class="card h-100 text-decoration-none text-dark shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Administrador</h5>
+              <p class="card-text">Acceso al panel de administración.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">Entrar →</div>
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="{{ url_for('prestador.login') }}" class="card h-100 text-decoration-none text-dark shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Prestador</h5>
+              <p class="card-text">Acceso para prestadores — ver visitas asignadas.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">Entrar →</div>
+          </a>
+        </div>
+
+        <div class="col-md-4">
+          <a href="{{ url_for('publico.solicitar_visita') }}" class="card h-100 text-decoration-none text-dark shadow-sm">
+            <div class="card-body">
+              <h5 class="card-title">Público — Solicitar visita</h5>
+              <p class="card-text">Formulario público para registrar una nueva solicitud de visita.</p>
+            </div>
+            <div class="card-footer bg-transparent border-top-0">Registrar →</div>
+          </a>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
