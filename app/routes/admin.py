@@ -1,4 +1,3 @@
-
 from flask import Blueprint, render_template, request, redirect, url_for, flash
 from flask_login import current_user, login_required, login_user, logout_user
 from app.models.solicitud_visita import SolicitudVisita
@@ -129,15 +128,44 @@ def rechazar_solicitud(id):
 @login_required
 @admin_required
 def asignar_horarios(id):
+    # ...existing code...
     solicitud = SolicitudVisita.query.get_or_404(id)
     try:
         seleccionados = solicitud.get_prestadores_seleccionados()
     except Exception:
         seleccionados = json.loads(solicitud.prestadores_solicitados or '[]')
+
     query = Prestador.query.filter_by(activo=True)
     if getattr(solicitud, 'tipo_institucion', None) and hasattr(Prestador, 'tipo_institucion'):
         query = query.filter_by(tipo_institucion=solicitud.tipo_institucion)
+
+    # obtenemos todos los prestadores disponibles ordenados por razon_social
     disponibles = query.order_by(Prestador.razon_social).all()
+
+    # Reordenar para mostrar primero los seleccionados
+    # soporta seleccionados como: ['Nombre A', 'Nombre B'] o [{'prestador_nombre':'Nombre A'}, ...] o lista de ids
+    sel_names = set()
+    sel_ids = set()
+    for item in (seleccionados or []):
+        if isinstance(item, dict):
+            nombre = item.get('prestador_nombre') or item.get('razon_social')
+            if nombre:
+                sel_names.add(nombre)
+            if 'prestador_id' in item:
+                try:
+                    sel_ids.add(int(item.get('prestador_id')))
+                except Exception:
+                    pass
+        else:
+            # puede ser string (nombre) o numero (id)
+            try:
+                # si item puede ser int, considerarlo id
+                sel_ids.add(int(item))
+            except Exception:
+                sel_names.add(str(item))
+
+    # ordenar: primeros los seleccionados (por nombre o id), luego el resto; todos por razon_social
+    disponibles.sort(key=lambda p: (0 if (p.id in sel_ids or p.razon_social in sel_names or getattr(p,'email',None) in sel_names) else 1, (p.razon_social or '').lower()))
 
     return render_template('admin/asignar_horarios.html',
                            solicitud=solicitud,
