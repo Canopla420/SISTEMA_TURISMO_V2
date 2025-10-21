@@ -47,6 +47,7 @@ class Prestador(db.Model, UserMixin):
     
     # METADATOS
     activo = db.Column(db.Boolean, default=True)
+    role = db.Column(db.String(20), nullable=False, default='prestador')  # 'prestador' | 'admin'
     fecha_creacion = db.Column(db.DateTime, default=datetime.utcnow)
     
     def __repr__(self):
@@ -68,3 +69,9 @@ class Prestador(db.Model, UserMixin):
             return json.loads(self.edades_recomendadas) if self.edades_recomendadas else []
         except:
             return []
+
+    def is_admin(self):
+        return (self.role or '') == 'admin'
+
+    def is_prestador(self):
+        return (self.role or '') == 'prestador'

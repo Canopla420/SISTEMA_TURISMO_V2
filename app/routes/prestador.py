@@ -6,6 +6,7 @@ from app.models.visita_prestador import VisitaPrestador
 from sqlalchemy.orm import joinedload
 from app import db
 from datetime import datetime
+from app.decorators import prestador_required
 
 bp = Blueprint('prestador', __name__)
 
@@ -29,6 +30,7 @@ def login():
 
 @bp.route('/mis-visitas', methods=['GET'])
 @login_required
+@prestador_required
 def mis_visitas():
     prestador_id = getattr(current_user, 'prestador_id', None) or current_user.id
     visitas = VisitaPrestador.query.options(

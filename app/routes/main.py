@@ -4,7 +4,7 @@ bp = Blueprint('main', __name__)
 
 @bp.route('/')
 def index():
-    return render_template('test.html')  # ← USAR EL QUE SÍ EXISTE
+    return render_template('index.html')
 
 @bp.route('/test')
 def test():
